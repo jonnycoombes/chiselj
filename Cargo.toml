@@ -3,13 +3,6 @@ name = "chisel"
 version = "0.1.0"
 edition = "2021"
 
-[workspace]
-members = [
-    "parser",
-    "utils",
-    "char_stream"
-]
-
 [dependencies]
 clap = "4.1.6"
 bitflags = "2.0.0-rc.3"

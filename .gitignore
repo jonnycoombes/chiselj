@@ -14,3 +14,6 @@ Cargo.lock
 *.pdb
 .idea
 .idea/**
+
+# We don't want to include the tags in the repo
+rusty-tags.vi

@@ -5,11 +5,3 @@ edition = "2021"
 
 [dependencies]
 clap = "4.1.6"
-bitflags = "2.0.0-rc.3"
-env_logger = { workspace = true }
-log = { workspace = true }
-
-[workspace.dependencies]
-fxhash = "0.2.1"
-env_logger = "0.10.0"
-log = "0.4.17"

@@ -12,8 +12,7 @@ pub enum Alignment {
 
 /// Primitive rendering operations used for output and state management
 #[derive(Debug, Clone)]
-pub enum OpCode
-{
+pub enum OpCode {
     /// Output a newline
     NewLine,
     /// Output a single character
@@ -47,6 +46,3 @@ pub enum OpCode
     /// Output a static slice
     Slice(&'static str),
 }
-
-/// Boxed rendering instruction
-pub type OpCodePtr = Rc<Box<OpCode>>;

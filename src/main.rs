@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use actions::print::PrintAction;
+use actions::{Action, ActionContext};
 use chisel_json::errors::ParserResult;
 use chisel_json::events::{Event, Match};
 use chisel_json::sax::Parser as SaxParser;
@@ -7,6 +9,7 @@ use clap::Parser as ClapParser;
 use cli::Arguments;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
+mod actions;
 mod cli;
 
 fn on_sax_event(event: &Event) -> ParserResult<()> {
@@ -41,8 +44,12 @@ fn main() {
     let _args = Arguments::parse();
     let stdin = io::stdin();
     let mut reader = BufReader::new(stdin);
-    match reader.read_to_end(&mut buffer) {
-        Ok(_) => process(buffer.as_slice()),
-        Err(_) => (),
-    }
+    reader
+        .read_to_end(&mut buffer)
+        .expect("Failed to read input");
+    let mut context = ActionContext { input: &reader };
+    let mut action = PrintAction {};
+    action
+        .execute(&mut context)
+        .expect("Action failed to execute");
 }

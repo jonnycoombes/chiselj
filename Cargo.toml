@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 clap = {version = "4.1.6", features = ["derive", "cargo"]}
+chisel-json = {version = "0.1.16"}
+termion = {version = "2.0.1"}

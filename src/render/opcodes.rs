@@ -40,5 +40,5 @@ pub enum OpCode {
     /// Output text
     Text(String),
     /// Output a static slice
-    Slice(&'static str),
-}
+    Slice(&'static str)
+

@@ -6,9 +6,7 @@ use chisel_json::errors::ParserResult;
 use chisel_json::events::{Event, Match};
 use chisel_json::sax::Parser as SaxParser;
 use clap::Parser as ClapParser;
-use cli::Arguments;
-use std::io::prelude::*;
-use std::io::{self, BufReader};
+use cli::{ActionCommand, Arguments};
 mod actions;
 mod cli;
 
@@ -40,16 +38,18 @@ fn process(source: &[u8]) {
 
 /// This is where the fun starts
 fn main() {
-    let mut buffer: Vec<u8> = vec![];
-    let _args = Arguments::parse();
-    let stdin = io::stdin();
-    let mut reader = BufReader::new(stdin);
-    reader
-        .read_to_end(&mut buffer)
-        .expect("Failed to read input");
-    let mut context = ActionContext { input: &reader };
-    let mut action = PrintAction {};
-    action
-        .execute(&mut context)
-        .expect("Action failed to execute");
+    let args = Arguments::parse();
+
+    match args.command {
+        ActionCommand::Print(args) => {
+            let mut context = ActionContext { args: &args };
+            let mut action = PrintAction {};
+            action
+                .execute(&mut context)
+                .expect("Action failed to execute");
+        }
+        ActionCommand::Filter(_args) => {
+            println!("filter selected")
+        }
+    }
 }

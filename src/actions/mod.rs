@@ -1,5 +1,3 @@
-use std::io::BufRead;
-
 /// The default print action
 pub mod print;
 
@@ -13,13 +11,14 @@ pub enum ActionError {
 }
 
 /// An action context provides all the information and configuration needed to process an action
-pub struct ActionContext<'a> {
-    /// A [BufRead] containing the source bytes for the action. (Should be JSON-like).
-    pub input: &'a dyn BufRead,
+#[derive(Debug)]
+pub struct ActionContext<'a, Args> {
+    /// The parameters for the given action
+    pub args: &'a Args,
 }
 
-/// An action is something that processes the input, based on a given configuration
-pub trait Action<T> {
+/// An action is
+pub trait Action<Args, Output> {
     /// Execute the action, taking in a reference to
-    fn execute<'a>(&mut self, context: &mut ActionContext<'a>) -> ActionResult<T>;
+    fn execute<'a>(&mut self, context: &mut ActionContext<'a, Args>) -> ActionResult<Output>;
 }

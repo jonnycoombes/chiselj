@@ -9,6 +9,7 @@ use clap::Parser as ClapParser;
 use cli::{ActionCommand, Arguments};
 mod actions;
 mod cli;
+mod render;
 
 fn on_sax_event(event: &Event) -> ParserResult<()> {
     match &event.matched {

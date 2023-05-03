@@ -1,7 +1,3 @@
-use std::fmt;
-use std::fmt::{Display, Formatter, LowerHex};
-use std::rc::Rc;
-
 /// Allowable alignment values
 #[derive(Debug, Clone)]
 pub enum Alignment {

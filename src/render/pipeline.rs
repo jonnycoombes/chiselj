@@ -2,7 +2,7 @@
 //! rendering operations can be sent to a specific renderer grouped together into batches
 //!
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum FontStyle {
     /// Normal font
     Normal,
@@ -13,7 +13,7 @@ pub enum FontStyle {
 }
 
 /// Allowable alignment values
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Alignment {
     Left,
     Right,
@@ -21,7 +21,7 @@ pub enum Alignment {
 }
 
 /// Primitive drawing operations
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DrawOperation<'a> {
     /// Output a newline
     NewLine,
@@ -40,6 +40,7 @@ pub enum DrawOperation<'a> {
 }
 
 /// Render state mutation operations
+#[derive(Debug, PartialEq)]
 pub enum StateOperation {
     /// Clear the current buffer
     Clear,
@@ -72,6 +73,7 @@ pub enum PipelineCommand<'a> {
 
 /// A display list can either be immediate (meaning render immediately) or deferred (meaning that
 /// the renderer may decide to not render immediately)
+#[derive(Debug, PartialEq)]
 pub enum DisplayListMode {
     /// The display list should be rendered immediately
     Immediate,

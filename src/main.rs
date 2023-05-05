@@ -1,49 +1,32 @@
 #![allow(dead_code)]
 
+use core::time;
+
 use actions::print::PrintAction;
 use actions::{Action, ActionContext};
-use chisel_json::errors::ParserResult;
-use chisel_json::events::{Event, Match};
-use chisel_json::sax::Parser as SaxParser;
 use clap::Parser as ClapParser;
 use cli::{ActionCommand, Arguments};
+use render::pipeline::{DisplayList, DisplayListMode, PipelineCommand, StateOperation};
+use render::tui::create_renderer;
+use threads::AppThreads;
 mod actions;
 mod cli;
 mod render;
-
-fn on_sax_event(event: &Event) -> ParserResult<()> {
-    match &event.matched {
-        Match::StartOfInput => (),
-        Match::EndOfInput => (),
-        Match::StartObject => println!("{{"),
-        Match::ObjectKey(key) => print!("{} : ", key),
-        Match::EndObject => println!("}}"),
-        Match::StartArray => println!("["),
-        Match::EndArray => println!("]"),
-        Match::String(val) => println!("{},", val),
-        Match::Integer(val) => println!("{},", val),
-        Match::Float(val) => println!("{},", val),
-        Match::Boolean(val) => println!("{},", val),
-        Match::Null => todo!(),
-    }
-    Ok(())
-}
-
-fn process(source: &[u8]) {
-    let parser = SaxParser::default();
-    match parser.parse_bytes(source, &mut on_sax_event) {
-        Ok(_) => std::process::exit(0),
-        Err(_) => std::process::exit(1),
-    }
-}
+mod threads;
 
 /// This is where the fun starts
 fn main() {
     let args = Arguments::parse();
+    let state = AppThreads {
+        renderer: create_renderer(),
+    };
 
     match args.command {
         ActionCommand::Print(args) => {
-            let mut context = ActionContext { args: &args };
+            let mut context = ActionContext {
+                args: &args,
+                pipeline: state.renderer.sink.clone(),
+            };
             let mut action = PrintAction {};
             action
                 .execute(&mut context)
@@ -53,4 +36,21 @@ fn main() {
             println!("filter selected")
         }
     }
+
+    state
+        .renderer
+        .sink
+        .send(DisplayList {
+            mode: DisplayListMode::Immediate,
+            ops: vec![PipelineCommand::State(StateOperation::Terminate)],
+        })
+        .expect("Failed to issue pipeline command");
+
+    std::thread::sleep(time::Duration::from_millis(5000));
+    println!("Waiting for app threads to clear up and join...");
+    state
+        .renderer
+        .handle
+        .join()
+        .expect("Something went wrong whilst joining render thread");
 }

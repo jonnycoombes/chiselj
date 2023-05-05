@@ -1,6 +1,6 @@
 use super::{Action, ActionContext, ActionResult};
 use crate::cli::PrintArgs;
-use crate::render::pipeline::{DisplayList, DisplayListMode, PipelineCommand};
+use crate::render::operations::{DisplayList, DisplayListMode, DrawOperation, PipelineCommand};
 
 const GREETING: &str = "Hi from the print operation";
 
@@ -10,12 +10,10 @@ pub struct PrintAction {}
 impl Action<PrintArgs, ()> for PrintAction {
     fn execute<'a>(&mut self, context: &'a mut ActionContext<PrintArgs>) -> ActionResult<()> {
         context
-            .pipeline
+            .renderer
             .send(DisplayList {
                 mode: DisplayListMode::Immediate,
-                ops: vec![PipelineCommand::Render(
-                    crate::render::pipeline::DrawOperation::Slice(GREETING),
-                )],
+                ops: vec![PipelineCommand::Render(DrawOperation::Slice(GREETING))],
             })
             .expect("Failed to send to pipeline");
         Ok(())

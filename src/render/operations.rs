@@ -1,7 +1,6 @@
 //! All rendering to the TUI is carried out through a pipeline and display list abstraction so that sequences of
 //! rendering operations can be sent to a specific renderer grouped together into batches
 //!
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum FontStyle {
     /// Normal font
@@ -22,7 +21,7 @@ pub enum Alignment {
 
 /// Primitive drawing operations
 #[derive(Debug, Clone, PartialEq)]
-pub enum DrawOperation<'a> {
+pub enum DrawOperation {
     /// Output a newline
     NewLine,
     /// Indent by a positive number of chars
@@ -36,7 +35,7 @@ pub enum DrawOperation<'a> {
     /// Output text
     Text(String),
     /// Output a static slice
-    Slice(&'a str),
+    Slice(&'static str),
 }
 
 /// Render state mutation operations
@@ -64,11 +63,11 @@ pub enum StateOperation {
 
 /// A pipeline command is basically just a sum type, either a state related command, or a render
 /// command
-pub enum PipelineCommand<'a> {
+pub enum PipelineCommand {
     /// A command to mutate the state of the pipeline
     State(StateOperation),
     /// Render, using a specific op code
-    Render(DrawOperation<'a>),
+    Render(DrawOperation),
 }
 
 /// A display list can either be immediate (meaning render immediately) or deferred (meaning that
@@ -82,12 +81,9 @@ pub enum DisplayListMode {
 }
 
 /// A display list is currently just a vector of [RenderCommand]s
-pub struct DisplayList<'a> {
+pub struct DisplayList {
     /// The mode for the display list
     pub mode: DisplayListMode,
     /// The operations associated with the display list
-    pub ops: Vec<PipelineCommand<'a>>,
+    pub ops: Vec<PipelineCommand>,
 }
-
-/// A pipeline is a wrapper around a channel and some other stuffs
-pub type Pipeline<'a> = std::sync::mpsc::Sender<DisplayList<'a>>;

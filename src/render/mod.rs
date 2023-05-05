@@ -1,2 +1,2 @@
-pub mod pipeline;
-pub mod tui;
+pub mod operations;
+pub mod renderer;

@@ -4,7 +4,17 @@ use crate::threads::AppThread;
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
 
-struct RenderState {}
+use crossterm::style::Color;
+use crossterm::{cursor, execute, style, terminal};
+
+/// Used to track the internal render state
+#[derive(Debug)]
+struct RenderState {
+    /// The current terminal size
+    pub size: (u16, u16),
+    /// The current cursor position
+    pub position: (u16, u16),
+}
 
 /// Create a new rendering thread
 pub fn new_renderer() -> AppThread<DisplayList, ()> {
@@ -18,7 +28,26 @@ pub fn new_renderer() -> AppThread<DisplayList, ()> {
 /// The main rendering logic flows out from here
 #[cfg(feature = "crossterm")]
 fn render(source: Receiver<DisplayList>) {
-    let _state = RenderState {};
+    use std::io::stdout;
+
+    let _state = RenderState {
+        size: terminal::size().unwrap(),
+        position: cursor::position().unwrap(),
+    };
+    dbg!(_state);
+
+    execute!(
+        stdout(),
+        terminal::Clear(terminal::ClearType::All),
+        style::SetForegroundColor(Color::Rgb {
+            r: 45,
+            g: 45,
+            b: 45
+        }),
+        cursor::MoveTo(0, 0)
+    )
+    .expect("Failed to clear");
+
     loop {
         match source.recv() {
             Ok(list) => {

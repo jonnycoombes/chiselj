@@ -49,7 +49,7 @@ fn initial_render_state(options: &RenderOptions) -> RenderState {
         size: terminal::size().unwrap(),
         position: cursor::position().unwrap(),
         control_code: RenderControlCode::Continue,
-        theme: Theme { space_char: '.' },
+        theme: Theme { indent: ' ' },
     }
 }
 
@@ -101,11 +101,15 @@ fn handle_render_command(state: &mut RenderState, cmd: &RenderCommand) -> Render
         RenderCommand::NewLine => println!(""),
         RenderCommand::Indent(n) => {
             for _ in 0..*n {
-                print!("{}", state.theme.space_char)
+                print!("{}", state.theme.indent)
             }
         }
         RenderCommand::Char(c) => print!("{}", c),
-        RenderCommand::Repeat(_, _) => todo!(),
+        RenderCommand::Repeat(c, n) => {
+            for _ in 0..*n {
+                print!("{}", c);
+            }
+        }
         RenderCommand::FixedWidthText(_, _) => todo!(),
         RenderCommand::Text(s) => print!("{}", s),
         RenderCommand::Slice(s) => print!("{}", s),

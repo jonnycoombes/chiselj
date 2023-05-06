@@ -1,6 +1,5 @@
-use std::path::PathBuf;
-
 use clap::{crate_version, Args, Parser, Subcommand};
+use std::path::PathBuf;
 
 /// Top level command line arguments and configuration settings
 #[derive(Parser)]

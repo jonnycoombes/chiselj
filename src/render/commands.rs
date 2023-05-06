@@ -1,6 +1,6 @@
 #![allow(unused_macros)]
 //! All rendering to the TUI is carried out through a pipeline and display list abstraction so that sequences of
-//! rendering operations can be sent to a specific renderer grouped together into batches
+//! rendering commands can be sent to a specific renderer grouped together into batches
 //!
 #[derive(Debug, Clone, PartialEq)]
 pub enum FontStyle {

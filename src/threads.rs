@@ -1,7 +1,6 @@
+use crate::render::commands::CommandList;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
-
-use crate::render::commands::CommandList;
 
 /// Structure combining a [JoinHandle] for an executing thread, along with
 /// channel information to communicate with the thread

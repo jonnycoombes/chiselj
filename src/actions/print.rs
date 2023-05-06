@@ -1,7 +1,7 @@
 use super::{Action, ActionContext, ActionResult};
 use crate::cli::PrintArgs;
 use crate::render;
-use crate::render::operations::{DisplayList, DisplayListMode, PipelineCommand, RenderCommand};
+use crate::render::commands::{DisplayList, DisplayListMode, PipelineCommand, RenderCommand};
 
 const GREETING: &str = "Hi from the print operation";
 

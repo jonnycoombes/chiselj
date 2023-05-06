@@ -1,4 +1,4 @@
-use crate::render::operations::{DisplayList, DisplayListMode, PipelineCommand, StateCommand};
+use crate::render::commands::{DisplayList, DisplayListMode, PipelineCommand, StateCommand};
 use crate::render::renderer::{new_renderer, RenderOptions};
 use crate::state;
 use crate::threads::AppThreads;

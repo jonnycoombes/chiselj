@@ -1,5 +1,5 @@
 //! The renderer for text UIs ??
-use super::operations::{DisplayList, PipelineCommand, RenderCommand, StateCommand};
+use super::commands::{DisplayList, PipelineCommand, RenderCommand, StateCommand};
 use crate::threads::AppThread;
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;

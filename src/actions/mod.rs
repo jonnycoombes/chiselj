@@ -1,4 +1,4 @@
-use crate::render::operations::DisplayList;
+use crate::render::commands::DisplayList;
 use std::sync::mpsc::Sender;
 /// The default print action
 pub mod print;

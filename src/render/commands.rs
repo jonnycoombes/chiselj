@@ -94,7 +94,7 @@ macro_rules! render {
 /// A display list can either be immediate (meaning render immediately) or deferred (meaning that
 /// the renderer may decide to not render immediately)
 #[derive(Debug, PartialEq)]
-pub enum DisplayListMode {
+pub enum CommandListMode {
     /// The display list should be rendered immediately
     Immediate,
     /// The display list may be deferred and rendered later
@@ -102,9 +102,9 @@ pub enum DisplayListMode {
 }
 
 /// A display list is currently just a vector of [RenderCommand]s
-pub struct DisplayList {
+pub struct CommandList {
     /// The mode for the display list
-    pub mode: DisplayListMode,
+    pub mode: CommandListMode,
     /// The operations associated with the display list
     pub cmds: Vec<PipelineCommand>,
 }

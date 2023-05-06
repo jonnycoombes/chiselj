@@ -1,4 +1,4 @@
-use crate::render::commands::{DisplayList, DisplayListMode, PipelineCommand, StateCommand};
+use crate::render::commands::{CommandList, CommandListMode, PipelineCommand, StateCommand};
 use crate::render::renderer::{new_renderer, RenderOptions};
 use crate::state;
 use crate::threads::AppThreads;
@@ -21,7 +21,7 @@ impl AppState {
     }
 
     /// Get a clone of the transmitter for the rendering thread
-    pub fn get_render_pipeline(&self) -> Sender<DisplayList> {
+    pub fn get_render_pipeline(&self) -> Sender<CommandList> {
         self.threads.renderer.sink.clone()
     }
 
@@ -30,8 +30,8 @@ impl AppState {
         self.threads
             .renderer
             .sink
-            .send(DisplayList {
-                mode: DisplayListMode::Immediate,
+            .send(CommandList {
+                mode: CommandListMode::Immediate,
                 cmds: vec![state!(StateCommand::Terminate)],
             })
             .expect("Failed to send terminate op to renderer");

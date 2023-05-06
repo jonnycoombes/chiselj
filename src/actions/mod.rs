@@ -1,4 +1,4 @@
-use crate::render::commands::DisplayList;
+use crate::render::commands::CommandList;
 use std::sync::mpsc::Sender;
 /// The default print action
 pub mod print;
@@ -19,7 +19,7 @@ pub struct ActionContext<'a, Args> {
     pub args: &'a Args,
 
     /// The rendering pipeline
-    pub pipeline: Sender<DisplayList>,
+    pub pipeline: Sender<CommandList>,
 }
 
 /// An action is

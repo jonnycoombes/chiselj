@@ -15,10 +15,12 @@ pub struct Arguments {
 /// Enumeration of available commands and their associated arguments
 #[derive(Debug, Subcommand)]
 pub enum ActionCommand {
-    /// Print the supplied input
+    /// Print the input
     Print(PrintArgs),
-    /// Filter the supplied input
+    /// Filter the input
     Filter(FilterArgs),
+    /// Manipulate pointers within the input
+    Pointers(PointerArgs),
 }
 
 #[derive(Debug, Args)]
@@ -30,6 +32,13 @@ pub struct PrintArgs {
 
 #[derive(Debug, Args)]
 pub struct FilterArgs {
+    /// (Optional) input file.
+    #[arg(short, long, value_name = "FILE")]
+    file: Option<PathBuf>,
+}
+
+#[derive(Debug, Args)]
+pub struct PointerArgs {
     /// (Optional) input file.
     #[arg(short, long, value_name = "FILE")]
     file: Option<PathBuf>,

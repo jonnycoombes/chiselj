@@ -1,4 +1,4 @@
-//! The renderer for text UIs ??
+//! The renderer for text UIs
 use super::commands::{CommandList, PipelineCommand, RenderCommand, StateCommand};
 use super::themes::Theme;
 use crate::threads::AppThread;
@@ -14,7 +14,7 @@ pub struct RenderOptions {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum RenderControlCode {
+enum RendererControlCode {
     Continue,
     Terminate,
 }
@@ -29,7 +29,8 @@ struct RenderState {
     /// The current cursor position
     pub position: (u16, u16),
     /// The current control code (governs the overall state of the rendering loop)
-    pub control_code: RenderControlCode,
+    pub control_code: RendererControlCode,
+    /// The current theme information
     pub theme: Theme,
 }
 
@@ -48,7 +49,7 @@ fn initial_render_state(options: &RenderOptions) -> RenderState {
         options: *options,
         size: terminal::size().unwrap(),
         position: cursor::position().unwrap(),
-        control_code: RenderControlCode::Continue,
+        control_code: RendererControlCode::Continue,
         theme: Theme { indent: ' ' },
     }
 }
@@ -65,7 +66,7 @@ fn render(options: RenderOptions, pipeline: Receiver<CommandList>) {
                         PipelineCommand::State(inner) => handle_state_command(&mut state, &inner),
                         PipelineCommand::Render(inner) => handle_render_command(&mut state, &inner),
                     };
-                    if state.control_code == RenderControlCode::Terminate {
+                    if state.control_code == RendererControlCode::Terminate {
                         return;
                     }
                 }
@@ -88,7 +89,7 @@ fn update_render_state(state: &mut RenderState) -> RenderState {
 #[cfg(feature = "crossterm")]
 fn handle_state_command(state: &mut RenderState, cmd: &StateCommand) -> RenderState {
     match cmd {
-        StateCommand::Terminate => state.control_code = RenderControlCode::Terminate,
+        StateCommand::Terminate => state.control_code = RendererControlCode::Terminate,
         _ => (),
     }
     update_render_state(state)

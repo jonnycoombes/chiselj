@@ -9,6 +9,7 @@ use cli::{ActionCommand, Arguments};
 
 mod actions;
 mod cli;
+mod errors;
 mod render;
 mod sources;
 mod state;
@@ -48,6 +49,11 @@ fn main() {
             let render_options = RenderOptions { raw: false };
             let (_state, _context) = create_state_and_context(&args, render_options);
             println!("filter selected")
+        }
+        ActionCommand::Pointers(args) => {
+            let render_options = RenderOptions { raw: false };
+            let (_state, _context) = create_state_and_context(&args, render_options);
+            println!("pointers selected")
         }
     }
 }

@@ -18,8 +18,8 @@ pub struct ActionContext<'a, Args> {
     /// The parameters for the given action
     pub args: &'a Args,
 
-    /// The renderer
-    pub renderer: Sender<DisplayList>,
+    /// The rendering pipeline
+    pub pipeline: Sender<DisplayList>,
 }
 
 /// An action is

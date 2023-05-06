@@ -1,3 +1,4 @@
+#![allow(unused_macros)]
 //! All rendering to the TUI is carried out through a pipeline and display list abstraction so that sequences of
 //! rendering operations can be sent to a specific renderer grouped together into batches
 //!
@@ -19,9 +20,9 @@ pub enum Alignment {
     Center,
 }
 
-/// Primitive drawing operations
+/// Primitive drawing coammands
 #[derive(Debug, Clone, PartialEq)]
-pub enum DrawOperation {
+pub enum RenderCommand {
     /// Output a newline
     NewLine,
     /// Indent by a positive number of chars
@@ -38,17 +39,21 @@ pub enum DrawOperation {
     Slice(&'static str),
 }
 
-/// Render state mutation operations
+/// Render state mutation commands
 #[derive(Debug, PartialEq)]
-pub enum StateOperation {
+pub enum StateCommand {
     /// Clear the current buffer
     Clear,
     /// Set the render cursor position
     SetCursor(u16, u16),
-    /// Push a colour
-    PushColour(u8, u8, u8),
-    /// Pop a colour
-    PopColour,
+    /// Push a foreground colour
+    PushForegroundColour(u8, u8, u8),
+    /// Pop a foreground colour
+    PopForegroundColour,
+    /// Push a background colour
+    PushBackgroundColour(u8, u8, u8),
+    /// Pop a background colour
+    PopBackgroundColour,
     /// Push a font style
     PushFontStyle(FontStyle),
     /// Pop the current font style
@@ -65,9 +70,25 @@ pub enum StateOperation {
 /// command
 pub enum PipelineCommand {
     /// A command to mutate the state of the pipeline
-    State(StateOperation),
+    State(StateCommand),
     /// Render, using a specific op code
-    Render(DrawOperation),
+    Render(RenderCommand),
+}
+
+/// Shorthand for creating state operations
+#[macro_export]
+macro_rules! state {
+    ($op : expr) => {
+        PipelineCommand::State($op)
+    };
+}
+
+/// Shorthand for creating render operations
+#[macro_export]
+macro_rules! render {
+    ($op : expr) => {
+        PipelineCommand::Render($op)
+    };
 }
 
 /// A display list can either be immediate (meaning render immediately) or deferred (meaning that
@@ -85,5 +106,5 @@ pub struct DisplayList {
     /// The mode for the display list
     pub mode: DisplayListMode,
     /// The operations associated with the display list
-    pub ops: Vec<PipelineCommand>,
+    pub cmds: Vec<PipelineCommand>,
 }

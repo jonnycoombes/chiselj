@@ -1,15 +1,23 @@
 //! The renderer for text UIs ??
-use super::operations::{DisplayList, DrawOperation, PipelineCommand, StateOperation};
+use super::operations::{DisplayList, PipelineCommand, RenderCommand, StateCommand};
 use crate::threads::AppThread;
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
 
-use crossterm::style::Color;
-use crossterm::{cursor, execute, style, terminal};
+use crossterm::{cursor, terminal};
+
+/// Structure used for setting initial rendering options
+#[derive(Debug, Clone, Copy)]
+pub struct RenderOptions {
+    /// Should raw mode be enabled?
+    pub raw: bool,
+}
 
 /// Used to track the internal render state
 #[derive(Debug)]
 struct RenderState {
+    /// The initially configured [RenderOptions]
+    pub options: RenderOptions,
     /// The current terminal size
     pub size: (u16, u16),
     /// The current cursor position
@@ -17,51 +25,36 @@ struct RenderState {
 }
 
 /// Create a new rendering thread
-pub fn new_renderer() -> AppThread<DisplayList, ()> {
+pub fn new_renderer(options: RenderOptions) -> AppThread<DisplayList, ()> {
     let (tx, rx) = channel::<DisplayList>();
     AppThread {
-        handle: Some(thread::spawn(move || render(rx))),
+        handle: Some(thread::spawn(move || render(options, rx))),
         sink: tx,
     }
 }
 
 /// The main rendering logic flows out from here
 #[cfg(feature = "crossterm")]
-fn render(source: Receiver<DisplayList>) {
-    use std::io::stdout;
-
+fn render(options: RenderOptions, pipeline: Receiver<DisplayList>) {
     let _state = RenderState {
+        options,
         size: terminal::size().unwrap(),
         position: cursor::position().unwrap(),
     };
-    dbg!(_state);
-
-    execute!(
-        stdout(),
-        terminal::Clear(terminal::ClearType::All),
-        style::SetForegroundColor(Color::Rgb {
-            r: 45,
-            g: 45,
-            b: 45
-        }),
-        cursor::MoveTo(0, 0)
-    )
-    .expect("Failed to clear");
-
     loop {
-        match source.recv() {
+        match pipeline.recv() {
             Ok(list) => {
-                for op in list.ops {
-                    match op {
-                        PipelineCommand::State(cmd) => match &cmd {
-                            StateOperation::Terminate => {
+                for cmd in list.cmds {
+                    match cmd {
+                        PipelineCommand::State(inner) => match &inner {
+                            StateCommand::Terminate => {
                                 println!("Termination requested");
                                 return;
                             }
                             _ => (),
                         },
-                        PipelineCommand::Render(cmd) => match &cmd {
-                            DrawOperation::Slice(s) => {
+                        PipelineCommand::Render(inner) => match &inner {
+                            RenderCommand::Slice(s) => {
                                 println!("{}", s);
                             }
                             _ => (),
@@ -74,10 +67,10 @@ fn render(source: Receiver<DisplayList>) {
     }
 }
 
-/// Handle any [PipelineCommand::State] operations
+/// Handle any [PipelineCommand::State] commands
 #[cfg(feature = "crossterm")]
-fn handle_state_operation(_state: &mut RenderState, _op: StateOperation) {}
+fn handle_state_command(_state: &mut RenderState, _op: StateCommand) {}
 
-/// Handle any [PipelineCommand::DrawOperation] operations
+/// Handle any [PipelineCommand::RenderCommand] commands
 #[cfg(feature = "crossterm")]
-fn handle_draw_operation(_state: &mut RenderState, _op: DrawOperation) {}
+fn handle_draw_command(_state: &mut RenderState, _op: RenderCommand) {}

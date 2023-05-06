@@ -14,7 +14,7 @@ mod state;
 mod threads;
 
 /// Create a new [AppState] and [ActionContext] based on non-raw rendering
-fn create_raw_state_context<'a, T>(args: &'a T) -> (AppState, ActionContext<'a, T>) {
+fn create_non_raw_state_context<'a, T>(args: &'a T) -> (AppState, ActionContext<'a, T>) {
     let render_options = RenderOptions { raw: false };
     let state = AppState::new(render_options);
     let context = ActionContext {
@@ -30,7 +30,7 @@ fn main() {
 
     match args.command {
         ActionCommand::Print(args) => {
-            let (mut state, mut context) = create_raw_state_context(&args);
+            let (mut state, mut context) = create_non_raw_state_context(&args);
             let mut action = PrintAction {};
             action
                 .execute(&mut context)
@@ -38,7 +38,7 @@ fn main() {
             state.halt_renderer();
         }
         ActionCommand::Filter(args) => {
-            let (_state, _context) = create_raw_state_context(&args);
+            let (_state, _context) = create_non_raw_state_context(&args);
             println!("filter selected")
         }
     }

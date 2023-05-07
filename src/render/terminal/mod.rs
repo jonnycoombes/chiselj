@@ -1,17 +1,11 @@
 //! The renderer for text UIs
 use super::commands::{CommandList, PipelineCommand, RenderCommand, StateCommand};
-use super::themes::Theme;
+use super::{options::RenderOptions, themes::Theme};
 use crate::threads::AppThread;
-use crossterm::{cursor, terminal};
+use crossterm::terminal;
+use std::io::{stdout, Write};
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
-
-/// Structure used for setting initial rendering options
-#[derive(Debug, Clone, Copy)]
-pub struct RenderOptions {
-    /// Should raw mode be enabled?
-    pub raw: bool,
-}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 enum RendererControlCode {
@@ -24,10 +18,6 @@ enum RendererControlCode {
 struct RenderState {
     /// The initially configured [RenderOptions]
     pub options: RenderOptions,
-    /// The current terminal size
-    pub size: (u16, u16),
-    /// The current cursor position
-    pub position: (u16, u16),
     /// The current control code (governs the overall state of the rendering loop)
     pub control_code: RendererControlCode,
     /// The current theme information
@@ -47,8 +37,6 @@ pub fn new_renderer(options: RenderOptions) -> AppThread<CommandList, ()> {
 fn initial_render_state(options: &RenderOptions) -> RenderState {
     RenderState {
         options: *options,
-        size: terminal::size().unwrap(),
-        position: cursor::position().unwrap(),
         control_code: RendererControlCode::Continue,
         theme: Theme { indent: ' ' },
     }
@@ -57,21 +45,38 @@ fn initial_render_state(options: &RenderOptions) -> RenderState {
 /// The main rendering logic flows out from here
 #[cfg(feature = "crossterm")]
 fn render(options: RenderOptions, pipeline: Receiver<CommandList>) {
+    use super::commands::CommandListMode;
+
     let mut state = initial_render_state(&options);
+    if state.options.raw {
+        terminal::enable_raw_mode().unwrap();
+    }
+
+    // default to stdout but this may become pluggable in the future
+    let mut stdout = stdout();
     loop {
         match pipeline.recv() {
             Ok(list) => {
-                for cmd in list.cmds {
-                    state = match cmd {
-                        PipelineCommand::State(inner) => handle_state_command(&mut state, &inner),
-                        PipelineCommand::Render(inner) => handle_render_command(&mut state, &inner),
-                    };
-                    if state.control_code == RendererControlCode::Terminate {
-                        return;
+                if list.mode == CommandListMode::Immediate {
+                    for cmd in list.cmds {
+                        state = match cmd {
+                            PipelineCommand::State(inner) => {
+                                handle_state_command(&mut state, &inner)
+                            }
+                            PipelineCommand::Render(inner) => {
+                                handle_render_command(&mut stdout, &mut state, &inner)
+                            }
+                        };
+                        if state.control_code == RendererControlCode::Terminate {
+                            if terminal::is_raw_mode_enabled().unwrap() {
+                                terminal::disable_raw_mode().unwrap();
+                            }
+                            return;
+                        }
                     }
                 }
             }
-            Err(_) => todo!(),
+            Err(_) => (),
         }
     }
 }
@@ -80,8 +85,6 @@ fn render(options: RenderOptions, pipeline: Receiver<CommandList>) {
 /// etc...
 #[inline]
 fn update_render_state(state: &mut RenderState) -> RenderState {
-    state.position = cursor::position().unwrap();
-    state.size = terminal::size().unwrap();
     *state
 }
 
@@ -97,23 +100,29 @@ fn handle_state_command(state: &mut RenderState, cmd: &StateCommand) -> RenderSt
 
 /// Handle any [PipelineCommand::RenderCommand] commands
 #[cfg(feature = "crossterm")]
-fn handle_render_command(state: &mut RenderState, cmd: &RenderCommand) -> RenderState {
-    match cmd {
-        RenderCommand::NewLine => println!(""),
+fn handle_render_command(
+    out: &mut dyn Write,
+    state: &mut RenderState,
+    cmd: &RenderCommand,
+) -> RenderState {
+    let _result = match cmd {
+        RenderCommand::NewLine => write!(out, "\n"),
         RenderCommand::Indent(n) => {
             for _ in 0..*n {
-                print!("{}", state.theme.indent)
+                let _ = write!(out, "{}", state.theme.indent);
             }
+            Ok(())
         }
-        RenderCommand::Char(c) => print!("{}", c),
+        RenderCommand::Char(c) => write!(out, "{}", c),
         RenderCommand::Repeat(c, n) => {
             for _ in 0..*n {
-                print!("{}", c);
+                let _ = write!(out, "{}", c);
             }
+            Ok(())
         }
         RenderCommand::FixedWidthText(_, _) => todo!(),
-        RenderCommand::Text(s) => print!("{}", s),
-        RenderCommand::Slice(s) => print!("{}", s),
-    }
+        RenderCommand::Text(s) => write!(out, "{}", s),
+        RenderCommand::Slice(s) => write!(out, "{}", s),
+    };
     update_render_state(state)
 }

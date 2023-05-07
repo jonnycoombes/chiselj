@@ -1,10 +1,12 @@
 use crate::render::commands::{CommandList, CommandListMode, PipelineCommand, StateCommand};
-use crate::render::renderer::{new_renderer, RenderOptions};
+use crate::render::options::RenderOptions;
+use crate::render::terminal::new_renderer;
 use crate::state;
 use crate::threads::AppThreads;
 use std::sync::mpsc::Sender;
 
 /// Struct representing the global application state
+#[derive(Debug)]
 pub struct AppState {
     /// Worker threads
     threads: AppThreads,

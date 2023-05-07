@@ -4,6 +4,7 @@ use std::thread::JoinHandle;
 
 /// Structure combining a [JoinHandle] for an executing thread, along with
 /// channel information to communicate with the thread
+#[derive(Debug)]
 pub struct AppThread<Message, Result> {
     /// The [JoinHandle] used to wait for thread completion/cancellation etc...
     pub handle: Option<JoinHandle<Result>>,
@@ -18,6 +19,7 @@ impl<Message, Result> AppThread<Message, Result> {
 }
 
 /// Struct to hold global application state etc...
+#[derive(Debug)]
 pub struct AppThreads {
     /// The current rendering thread
     pub renderer: AppThread<CommandList, ()>,

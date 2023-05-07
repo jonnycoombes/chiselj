@@ -1,3 +1,4 @@
 pub mod commands;
-pub mod renderer;
+pub mod options;
+pub mod terminal;
 pub mod themes;

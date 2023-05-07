@@ -1,5 +1,7 @@
 //! Utilities for creating different parsing sources
 
+use atty::Stream;
+
 use crate::errors::{ChiselError, ChiselResult};
 use std::fs::File;
 use std::io::{stdin, BufReader, Read};
@@ -22,8 +24,13 @@ pub fn source_from_file<PathLike: AsRef<Path>>(
     }
 }
 
-/// Create a source buffer from [stdin]
+/// Create a source buffer from [stdin], but only if we're not running in a TTY so that we can be
+/// *reasonably* confident that we've got something coming down the pipe
 pub fn source_from_stdin(buffer: &mut Vec<u8>) -> ChiselResult<usize> {
+    if atty::is(Stream::Stdin) {
+        return Err(ChiselError::NoPipedInput);
+    }
+
     let mut reader = BufReader::new(stdin());
     reader
         .read_to_end(buffer)

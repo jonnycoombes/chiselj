@@ -1,4 +1,7 @@
-use crate::{errors::ChiselResult, render::commands::CommandList};
+use crate::{
+    errors::{ChiselError, ChiselResult},
+    render::commands::CommandList,
+};
 use std::sync::mpsc::Sender;
 /// The default print action
 pub mod print;
@@ -11,6 +14,16 @@ pub struct ActionContext<'a, Args> {
 
     /// The rendering pipeline
     pub pipeline: Sender<CommandList>,
+}
+
+impl<'a, Args> ActionContext<'a, Args> {
+    /// Submit a sequence of rendering commands to the current rendering pipeline
+    pub fn submit_render_commands(&self, commands: CommandList) -> ChiselResult<()> {
+        match self.pipeline.send(commands) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(ChiselError::RenderPipelineSendFailed),
+        }
+    }
 }
 
 /// An action is

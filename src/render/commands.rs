@@ -2,7 +2,7 @@
 //! All rendering to the TUI is carried out through a pipeline and display list abstraction so that sequences of
 //! rendering commands can be sent to a specific renderer grouped together into batches
 //!
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FontStyle {
     /// Normal font
     Normal,
@@ -68,6 +68,7 @@ pub enum StateCommand {
 
 /// A pipeline command is basically just a sum type, either a state related command, or a render
 /// command
+#[derive(Debug)]
 pub enum PipelineCommand {
     /// A command to mutate the state of the pipeline
     State(StateCommand),
@@ -102,9 +103,44 @@ pub enum CommandListMode {
 }
 
 /// A display list is currently just a vector of [RenderCommand]s
+#[derive(Debug)]
 pub struct CommandList {
     /// The mode for the display list
     pub mode: CommandListMode,
     /// The operations associated with the display list
     pub cmds: Vec<PipelineCommand>,
+}
+
+/// Helper macro for generating an immediate mode [CommandList]
+#[macro_export]
+macro_rules! cl_immediate {
+    ($($c : expr),+) => {
+        CommandList {
+            mode: CommandListMode::Immediate,
+            cmds: vec![$(PipelineCommand::Render($c)),*],
+        }
+    };
+    ($($c : expr,)+) => {
+        CommandList {
+            mode: CommandListMode::Immediate,
+            cmds: vec![$(PipelineCommand::Render($c)),*],
+        }
+    };
+}
+
+/// Helper macro for generating a deferred mode [CommandList]
+#[macro_export]
+macro_rules! cl_deferred {
+    ($($c : expr),+) => {
+        CommandList {
+            mode: CommandListMode::Deferred,
+            cmds: vec![$(PipelineCommand::Render($c)),*],
+        }
+    };
+    ($($c : expr,)+) => {
+        CommandList {
+            mode: CommandListMode::Deferred,
+            cmds: vec![$(PipelineCommand::Render($c)),*],
+        }
+    };
 }

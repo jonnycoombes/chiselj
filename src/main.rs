@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::render::renderer::RenderOptions;
+use crate::render::options::RenderOptions;
 use crate::state::AppState;
 use actions::print::PrintAction;
 use actions::{Action, ActionContext};
@@ -19,7 +19,7 @@ mod threads;
 ///
 /// 1. A specialised set of command arguments
 /// 2. A configuration for the renderer ([RenderOptions])
-fn create_state_and_context<'a, T>(
+fn new_state_and_context<'a, T>(
     args: &'a T,
     render_options: RenderOptions,
 ) -> (AppState, ActionContext<'a, T>) {
@@ -33,27 +33,31 @@ fn create_state_and_context<'a, T>(
 
 /// This is where the fun starts
 fn main() {
+    let mut exit_code = 0;
     let args = Arguments::parse();
+    let render_options = RenderOptions::default();
 
     match args.command {
         ActionCommand::Print(args) => {
-            let render_options = RenderOptions { raw: false };
-            let (mut state, mut context) = create_state_and_context(&args, render_options);
+            let (mut state, mut context) = new_state_and_context(&args, render_options);
             let mut action = PrintAction {};
-            action
-                .execute(&mut context)
-                .expect("Action failed to execute");
+            match action.execute(&mut context) {
+                Ok(_) => (),
+                Err(e) => {
+                    exit_code = 1;
+                    println!("💥{}", e)
+                }
+            }
             state.halt_renderer();
         }
-        ActionCommand::Filter(args) => {
-            let render_options = RenderOptions { raw: false };
-            let (_state, _context) = create_state_and_context(&args, render_options);
+        ActionCommand::Filter(_args) => {
             println!("filter selected")
         }
-        ActionCommand::Pointers(args) => {
-            let render_options = RenderOptions { raw: false };
-            let (_state, _context) = create_state_and_context(&args, render_options);
+        ActionCommand::Pointers(_args) => {
             println!("pointers selected")
         }
     }
+
+    // return a well-behaved error code
+    std::process::exit(exit_code);
 }

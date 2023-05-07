@@ -25,21 +25,25 @@ pub enum ActionCommand {
 
 #[derive(Debug, Args)]
 pub struct PrintArgs {
-    /// (Optional) input file.
+    /// Source JSON file. If not specified, input is assumed to come from stdin.
     #[arg(short, long, value_name = "FILE")]
-    file: Option<PathBuf>,
+    pub file: Option<PathBuf>,
+
+    /// Number of spaces to use during indentation
+    #[arg(short, long, value_name = "identation", default_value = "2")]
+    pub identation: u16,
 }
 
 #[derive(Debug, Args)]
 pub struct FilterArgs {
     /// (Optional) input file.
     #[arg(short, long, value_name = "FILE")]
-    file: Option<PathBuf>,
+    pub file: Option<PathBuf>,
 }
 
 #[derive(Debug, Args)]
 pub struct PointerArgs {
     /// (Optional) input file.
     #[arg(short, long, value_name = "FILE")]
-    file: Option<PathBuf>,
+    pub file: Option<PathBuf>,
 }

@@ -1,6 +1,6 @@
-use super::{Action, ActionContext, ActionResult};
+use super::{Action, ActionContext};
 use crate::cli::PrintArgs;
-use crate::render;
+use crate::errors::ChiselResult;
 use crate::render::commands::{CommandList, CommandListMode, PipelineCommand, RenderCommand};
 
 const GREETING: &str = "Hi from the print operation";
@@ -9,18 +9,7 @@ const GREETING: &str = "Hi from the print operation";
 pub struct PrintAction {}
 
 impl Action<PrintArgs, ()> for PrintAction {
-    fn execute<'a>(&mut self, context: &'a mut ActionContext<PrintArgs>) -> ActionResult<()> {
-        context
-            .pipeline
-            .send(CommandList {
-                mode: CommandListMode::Immediate,
-                cmds: vec![
-                    render!(RenderCommand::Indent(2)),
-                    render!(RenderCommand::Slice(GREETING)),
-                    render!(RenderCommand::NewLine),
-                ],
-            })
-            .expect("Failed to send to pipeline");
+    fn execute<'a>(&mut self, context: &'a mut ActionContext<PrintArgs>) -> ChiselResult<()> {
         Ok(())
     }
 }

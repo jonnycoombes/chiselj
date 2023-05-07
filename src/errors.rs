@@ -4,6 +4,7 @@
 pub type ChiselResult<T> = Result<T, ChiselError>;
 
 /// Enumeration covering various different common errors that might arise
+#[derive(Debug, Clone)]
 pub enum ChiselError {
     /// A catch-all general error type
     GeneralError(String),

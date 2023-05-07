@@ -68,9 +68,7 @@ fn render(options: RenderOptions, pipeline: Receiver<CommandList>) {
                             }
                         };
                         if state.control_code == RendererControlCode::Terminate {
-                            if terminal::is_raw_mode_enabled().unwrap() {
-                                terminal::disable_raw_mode().unwrap();
-                            }
+                            terminal::disable_raw_mode().unwrap();
                             return;
                         }
                     }

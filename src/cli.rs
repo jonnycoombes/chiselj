@@ -31,7 +31,11 @@ pub struct PrintArgs {
 
     /// Number of spaces to use during indentation
     #[arg(short, long, value_name = "identation", default_value = "2")]
-    pub identation: u16,
+    pub indentation: u16,
+
+    /// Number of spaces used to separate key value pairs
+    #[arg(short, long, value_name = "kvspacing", default_value = "1")]
+    pub kvspacing: u16,
 }
 
 #[derive(Debug, Args)]

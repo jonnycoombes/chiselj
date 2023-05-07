@@ -8,6 +8,6 @@ pub struct RenderOptions {
 /// Setup a sensible set of defaults for the rendering options
 impl Default for RenderOptions {
     fn default() -> Self {
-        Self { raw: true }
+        Self { raw: false }
     }
 }

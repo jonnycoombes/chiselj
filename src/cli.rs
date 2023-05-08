@@ -1,5 +1,5 @@
 use clap::{crate_version, Args, Parser, Subcommand};
-use std::path::PathBuf;
+use std::{ffi::OsString, path::PathBuf};
 
 /// Top level command line arguments and configuration settings
 #[derive(Parser)]
@@ -26,16 +26,20 @@ pub enum ActionCommand {
 #[derive(Debug, Args)]
 pub struct PrintArgs {
     /// Source JSON file. If not specified, input is assumed to come from stdin.
-    #[arg(short, long, value_name = "FILE")]
-    pub file: Option<PathBuf>,
+    #[arg(last = true, value_name = "FILE")]
+    pub file: Option<OsString>,
 
-    /// Number of spaces to use during indentation
-    #[arg(short, long, value_name = "identation", default_value = "2")]
-    pub indentation: u16,
+    /// Indent space count
+    ///
+    /// Object keys and array values are idented by this amount plus the parent identation amount
+    #[arg(short, long, value_name = "indent", default_value = "2")]
+    pub indent: u16,
 
-    /// Number of spaces used to separate key value pairs
-    #[arg(short, long, value_name = "kvspacing", default_value = "1")]
-    pub kvspacing: u16,
+    /// KV padding count
+    ///
+    /// The number of spaces added to each side of the ":" character in a <key> : <value> pair
+    #[arg(short, long, value_name = "kvpadding", default_value = "1")]
+    pub kvpadding: u16,
 }
 
 #[derive(Debug, Args)]

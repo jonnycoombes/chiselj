@@ -6,7 +6,7 @@ use chisel_json::JsonValue;
 use std::sync::mpsc::Sender;
 
 /// Options that control the output from a given printer instance
-pub struct PrintFormatOptions {
+pub struct PrettyPrintFormatOptions {
     /// The level of indent to use
     pub indent: u16,
 
@@ -15,7 +15,7 @@ pub struct PrintFormatOptions {
 }
 
 /// Default implementation uses some sensible default for the various options
-impl Default for PrintFormatOptions {
+impl Default for PrettyPrintFormatOptions {
     fn default() -> Self {
         Self {
             indent: 2,
@@ -25,18 +25,18 @@ impl Default for PrintFormatOptions {
 }
 
 /// Pretty printer for [JsonValue]s
-pub struct Printer {
+pub struct PrettyPrinter {
     /// The [ActionContext] associated with the printer
     pub pipeline: Sender<CommandList>,
 
     /// The formatting options
-    pub options: PrintFormatOptions,
+    pub options: PrettyPrintFormatOptions,
 }
 
-impl Printer {
+impl PrettyPrinter {
     /// Construct a new instance, based on a supplied context reference and set of options
-    pub fn new(pipeline: Sender<CommandList>, options: PrintFormatOptions) -> Self {
-        Printer { pipeline, options }
+    pub fn new(pipeline: Sender<CommandList>, options: PrettyPrintFormatOptions) -> Self {
+        PrettyPrinter { pipeline, options }
     }
 
     /// Chuck a [CommandList] at the rendering pipeline and perform error conversion if necessary

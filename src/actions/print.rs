@@ -1,7 +1,7 @@
 use super::{Action, ActionContext};
 use crate::cli::PrintArgs;
 use crate::errors::ChiselResult;
-use crate::render::printer::{PrintFormatOptions, Printer};
+use crate::render::pretty_printer::{PrettyPrintFormatOptions, PrettyPrinter};
 use crate::sources::{source_from_file, source_from_stdin};
 use chisel_json::coords::Coords;
 use chisel_json::dom::Parser;
@@ -28,13 +28,13 @@ impl Action<PrintArgs, ()> for PrintAction {
         match parse_result {
             Ok(json) => {
                 // extract the formatting options from the context args
-                let options = PrintFormatOptions {
+                let options = PrettyPrintFormatOptions {
                     indent: context.args.indent,
                     kvpadding: context.args.kvpadding,
                 };
 
                 // boof it out to the printer
-                let printer = Printer::new(context.clone_render_pipeline(), options);
+                let printer = PrettyPrinter::new(context.clone_render_pipeline(), options);
                 printer.render_json(json)?
             }
             Err(err) => {

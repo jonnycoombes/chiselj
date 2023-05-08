@@ -68,13 +68,19 @@ impl PrettyPrinter {
 
     /// Render a json array
     fn render_json_array(&self, level: u16, kids: Vec<JsonValue>) -> ChiselResult<()> {
-        // opening bracket
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Char('['),
-            RenderCommand::NewLine
-        ))?;
-
         let kidcount = kids.len();
+        let empty = kids.is_empty();
+
+        // opening bracket
+        if !empty {
+            self.submit_command_list(cl_immediate!(
+                RenderCommand::Char('['),
+                RenderCommand::NewLine
+            ))?;
+        } else {
+            self.submit_command_list(cl_immediate!(RenderCommand::Char('['),))?;
+        }
+
         for (i, value) in kids.into_iter().enumerate() {
             self.submit_command_list(cl_immediate!(RenderCommand::Indent(
                 (level + 1) * self.options.indent
@@ -99,10 +105,14 @@ impl PrettyPrinter {
         }
 
         // closing bracket
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indent),
-            RenderCommand::Char(']'),
-        ))
+        if !empty {
+            self.submit_command_list(cl_immediate!(
+                RenderCommand::Indent(level * self.options.indent),
+                RenderCommand::Char(']'),
+            ))
+        } else {
+            self.submit_command_list(cl_immediate!(RenderCommand::Char(']'),))
+        }
     }
 
     /// Render a string value
@@ -138,12 +148,17 @@ impl PrettyPrinter {
     /// children at the next indent level
     fn render_json_object(&self, level: u16, kids: Vec<(String, JsonValue)>) -> ChiselResult<()> {
         let kidcount = kids.len();
+        let empty = kids.is_empty();
 
         // opening brace
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Char('{'),
-            RenderCommand::NewLine
-        ))?;
+        if !empty {
+            self.submit_command_list(cl_immediate!(
+                RenderCommand::Char('{'),
+                RenderCommand::NewLine
+            ))?;
+        } else {
+            self.submit_command_list(cl_immediate!(RenderCommand::Char('{'),))?;
+        }
 
         // render the kids
         for (i, (key, value)) in kids.into_iter().enumerate() {
@@ -155,10 +170,14 @@ impl PrettyPrinter {
         }
 
         // closing brace with optional newline
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indent),
-            RenderCommand::Char('}'),
-        ))
+        if !empty {
+            self.submit_command_list(cl_immediate!(
+                RenderCommand::Indent(level * self.options.indent),
+                RenderCommand::Char('}'),
+            ))
+        } else {
+            self.submit_command_list(cl_immediate!(RenderCommand::Char('}'),))
+        }
     }
 
     /// Output a KV pair from within an object

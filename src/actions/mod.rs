@@ -1,7 +1,4 @@
-use crate::{
-    errors::{ChiselError, ChiselResult},
-    render::commands::CommandList,
-};
+use crate::{errors::ChiselResult, render::commands::CommandList};
 use std::sync::mpsc::Sender;
 /// The default print action
 pub mod print;

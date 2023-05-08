@@ -7,19 +7,19 @@ use std::sync::mpsc::Sender;
 
 /// Options that control the output from a given printer instance
 pub struct PrintFormatOptions {
-    /// The level of indentation to use
-    pub indentation: u16,
+    /// The level of indent to use
+    pub indent: u16,
 
-    /// The spacing between KV pairs
-    pub kvspacing: u16,
+    /// The padding between KV pairs
+    pub kvpadding: u16,
 }
 
 /// Default implementation uses some sensible default for the various options
 impl Default for PrintFormatOptions {
     fn default() -> Self {
         Self {
-            indentation: 2,
-            kvspacing: 1,
+            indent: 2,
+            kvpadding: 1,
         }
     }
 }
@@ -77,7 +77,7 @@ impl Printer {
         let kidcount = kids.len();
         for (i, value) in kids.into_iter().enumerate() {
             self.submit_command_list(cl_immediate!(RenderCommand::Indent(
-                (level + 1) * self.options.indentation
+                (level + 1) * self.options.indent
             )))?;
             match value {
                 JsonValue::Object(pairs) => self.render_json_object(level + 1, pairs)?,
@@ -100,7 +100,7 @@ impl Printer {
 
         // closing bracket
         self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indentation),
+            RenderCommand::Indent(level * self.options.indent),
             RenderCommand::Char(']'),
         ))
     }
@@ -134,8 +134,8 @@ impl Printer {
         self.submit_command_list(cl_immediate!(RenderCommand::Slice("null")))
     }
 
-    /// Surround an object with braces at the correct indentation level, and recursively render
-    /// children at the next indentation level
+    /// Surround an object with braces at the correct indent level, and recursively render
+    /// children at the next indent level
     fn render_json_object(&self, level: u16, kids: Vec<(String, JsonValue)>) -> ChiselResult<()> {
         let kidcount = kids.len();
 
@@ -156,7 +156,7 @@ impl Printer {
 
         // closing brace with optional newline
         self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indentation),
+            RenderCommand::Indent(level * self.options.indent),
             RenderCommand::Char('}'),
         ))
     }
@@ -171,11 +171,11 @@ impl Printer {
     ) -> ChiselResult<()> {
         // the key
         self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indentation),
+            RenderCommand::Indent(level * self.options.indent),
             RenderCommand::Text(key.to_string()),
-            RenderCommand::Indent(self.options.kvspacing),
+            RenderCommand::Indent(self.options.kvpadding),
             RenderCommand::Slice(":"),
-            RenderCommand::Indent(self.options.kvspacing),
+            RenderCommand::Indent(self.options.kvpadding),
         ))?;
 
         // the value

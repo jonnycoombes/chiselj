@@ -29,8 +29,8 @@ impl Action<PrintArgs, ()> for PrintAction {
             Ok(json) => {
                 // extract the formatting options from the context args
                 let options = PrintFormatOptions {
-                    indentation: context.args.indentation,
-                    kvspacing: context.args.kvspacing,
+                    indent: context.args.indent,
+                    kvpadding: context.args.kvpadding,
                 };
 
                 // boof it out to the printer

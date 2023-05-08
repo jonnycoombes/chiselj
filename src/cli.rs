@@ -15,11 +15,11 @@ pub struct Arguments {
 /// Enumeration of available commands and their associated arguments
 #[derive(Debug, Subcommand)]
 pub enum ActionCommand {
-    /// Print the input
+    /// Pretty printing
     Print(PrintArgs),
-    /// Filter the input
+    /// Filtering
     Filter(FilterArgs),
-    /// Manipulate pointers within the input
+    /// Inspecting and manipulating JSON pointers
     Pointers(PointerArgs),
 }
 

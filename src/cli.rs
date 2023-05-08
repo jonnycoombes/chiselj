@@ -1,6 +1,5 @@
-use std::path::PathBuf;
-
 use clap::{crate_version, Args, Parser, Subcommand};
+use std::path::PathBuf;
 
 /// Top level command line arguments and configuration settings
 #[derive(Parser)]
@@ -16,22 +15,39 @@ pub struct Arguments {
 /// Enumeration of available commands and their associated arguments
 #[derive(Debug, Subcommand)]
 pub enum ActionCommand {
-    /// Print the supplied input
+    /// Print the input
     Print(PrintArgs),
-    /// Filter the supplied input
+    /// Filter the input
     Filter(FilterArgs),
+    /// Manipulate pointers within the input
+    Pointers(PointerArgs),
 }
 
 #[derive(Debug, Args)]
 pub struct PrintArgs {
-    /// (Optional) input file.
+    /// Source JSON file. If not specified, input is assumed to come from stdin.
     #[arg(short, long, value_name = "FILE")]
-    file: Option<PathBuf>,
+    pub file: Option<PathBuf>,
+
+    /// Number of spaces to use during indentation
+    #[arg(short, long, value_name = "identation", default_value = "2")]
+    pub indentation: u16,
+
+    /// Number of spaces used to separate key value pairs
+    #[arg(short, long, value_name = "kvspacing", default_value = "1")]
+    pub kvspacing: u16,
 }
 
 #[derive(Debug, Args)]
 pub struct FilterArgs {
     /// (Optional) input file.
     #[arg(short, long, value_name = "FILE")]
-    file: Option<PathBuf>,
+    pub file: Option<PathBuf>,
+}
+
+#[derive(Debug, Args)]
+pub struct PointerArgs {
+    /// (Optional) input file.
+    #[arg(short, long, value_name = "FILE")]
+    pub file: Option<PathBuf>,
 }

@@ -32,13 +32,13 @@ pub struct PrintArgs {
     /// Indent space count
     ///
     /// Object keys and array values are idented by this amount plus the parent identation amount
-    #[arg(short, long, value_name = "indent", default_value = "2")]
+    #[arg(short, long, value_name = "n", default_value = "2")]
     pub indent: u16,
 
     /// KV padding count
     ///
     /// The number of spaces added to each side of the ":" character in a <key> : <value> pair
-    #[arg(short, long, value_name = "kvpadding", default_value = "1")]
+    #[arg(short, long, value_name = "n", default_value = "1")]
     pub kvpadding: u16,
 }
 

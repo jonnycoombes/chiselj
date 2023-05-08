@@ -2,11 +2,15 @@
 
 All the most recent changes are summarised and grouped below:
 
-## [unreleased]
+## [0.1.0] - 2023-05-08
 
 ### Features
 
 - Basic pretty printing implemented
+
+### Miscellaneous Tasks
+
+- Changelog generated
 
 ### Work In Progress
 
@@ -41,7 +45,5 @@ rendering thread
 - Changed changelog ordering to newest first
 - Altered default cliff changelog intro
 - Added cliff.toml
-
-## [0.1.0] - 2023-05-04
 
 

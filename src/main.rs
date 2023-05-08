@@ -26,7 +26,7 @@ fn new_state_and_context<'a, T>(
     let state = AppState::new(render_options);
     let context = ActionContext {
         args,
-        pipeline: state.get_render_pipeline(),
+        render_pipeline: state.get_render_pipeline(),
     };
     (state, context)
 }

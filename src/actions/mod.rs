@@ -13,16 +13,13 @@ pub struct ActionContext<'a, Args> {
     pub args: &'a Args,
 
     /// The rendering pipeline
-    pub pipeline: Sender<CommandList>,
+    pub render_pipeline: Sender<CommandList>,
 }
 
 impl<'a, Args> ActionContext<'a, Args> {
-    /// Submit a sequence of rendering commands to the current rendering pipeline
-    pub fn submit_render_commands(&self, commands: CommandList) -> ChiselResult<()> {
-        match self.pipeline.send(commands) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(ChiselError::RenderPipelineSendFailed),
-        }
+    /// Clone the render pipeline
+    pub fn clone_render_pipeline(&self) -> Sender<CommandList> {
+        self.render_pipeline.clone()
     }
 }
 

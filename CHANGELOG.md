@@ -8,10 +8,4 @@ All the most recent changes are summarised and grouped below:
 
 - Basic pretty printing implemented
 
-### Miscellaneous Tasks
-
-- Changelog updated
-- Bumped version number
-- Changelog generated
-
 

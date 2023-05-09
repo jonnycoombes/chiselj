@@ -1,6 +1,6 @@
 use crate::render::display_lists::{ChangeState, DisplayList, DisplayListCommand, DisplayListMode};
 use crate::render::options::DrawOptions;
-use crate::render::terminal::new_renderer;
+use crate::render::terminal_renderer::new_renderer;
 use crate::state;
 use crate::threads::AppThreads;
 use std::sync::mpsc::Sender;

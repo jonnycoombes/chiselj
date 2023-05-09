@@ -7,8 +7,9 @@ use std::io::{stdout, Write};
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
 
+/// Internal codes used to control the main rendering loop
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum DrawerControlCode {
+enum LoopControlCode {
     Continue,
     Terminate,
 }
@@ -19,7 +20,7 @@ struct DrawChangeState {
     /// The initially configured [DrawOptions]
     pub options: DrawOptions,
     /// The current control code (governs the overall state of the rendering loop)
-    pub control_code: DrawerControlCode,
+    pub control_code: LoopControlCode,
     /// The current theme information
     pub theme: Theme,
 }
@@ -37,7 +38,7 @@ pub fn new_renderer(options: DrawOptions) -> AppThread<DisplayList, ()> {
 fn initial_render_state(options: &DrawOptions) -> DrawChangeState {
     DrawChangeState {
         options: *options,
-        control_code: DrawerControlCode::Continue,
+        control_code: LoopControlCode::Continue,
         theme: Theme { indent: ' ' },
     }
 }
@@ -65,7 +66,7 @@ fn render(options: DrawOptions, pipeline: Receiver<DisplayList>) {
                                 handle_render_command(&mut stdout, &mut state, &inner)
                             }
                         };
-                        if state.control_code == DrawerControlCode::Terminate {
+                        if state.control_code == LoopControlCode::Terminate {
                             terminal::disable_raw_mode().unwrap();
                             return;
                         }
@@ -88,7 +89,7 @@ fn update_render_state(state: &mut DrawChangeState) -> DrawChangeState {
 #[cfg(feature = "crossterm")]
 fn handle_state_command(state: &mut DrawChangeState, cmd: &ChangeState) -> DrawChangeState {
     match cmd {
-        ChangeState::Terminate => state.control_code = DrawerControlCode::Terminate,
+        ChangeState::Terminate => state.control_code = LoopControlCode::Terminate,
         _ => (),
     }
     update_render_state(state)

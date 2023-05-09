@@ -1,5 +1,5 @@
 use crate::render::display_lists::{ChangeState, DisplayList, DisplayListCommand, DisplayListMode};
-use crate::render::options::DrawOptions;
+use crate::render::options::RenderOptions;
 use crate::render::terminal_renderer::new_renderer;
 use crate::state;
 use crate::threads::AppThreads;
@@ -14,7 +14,7 @@ pub struct AppChangeState {
 
 impl AppChangeState {
     /// Create a new instance of the global application state
-    pub fn new(render_options: DrawOptions) -> Self {
+    pub fn new(render_options: RenderOptions) -> Self {
         AppChangeState {
             threads: AppThreads {
                 renderer: new_renderer(render_options),

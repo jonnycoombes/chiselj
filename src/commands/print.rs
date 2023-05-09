@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use super::{Command, CommandContext};
 use crate::errors::ChiselResult;
-use crate::render::pretty_printer::{PrettyPrintFormatOptions, PrettyPrinter};
+use crate::render::pretty_printer::{FormatOptions, PrettyPrinter};
 use crate::sources::{source_from_file, source_from_stdin};
 use chisel_json::coords::Coords;
 use chisel_json::dom::Parser;
@@ -47,7 +47,7 @@ impl Command for PrintCommand {
         match parse_result {
             Ok(json) => {
                 // extract the formatting options from the context args
-                let options = PrettyPrintFormatOptions {
+                let options = FormatOptions {
                     indent: self.indent,
                     kvpadding: self.kvpadding,
                 };

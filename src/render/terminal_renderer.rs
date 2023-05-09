@@ -1,6 +1,6 @@
 //! The renderer for text UIs
 use super::display_lists::{ChangeState, DisplayList, DisplayListCommand, DisplayListMode, Draw};
-use super::{options::DrawOptions, themes::Theme};
+use super::{options::RenderOptions, themes::Theme};
 use crate::threads::AppThread;
 use crossterm::terminal;
 use std::io::{stdout, Write};
@@ -17,8 +17,8 @@ enum LoopControlCode {
 /// Used to track the internal render state
 #[derive(Debug, Copy, Clone)]
 struct RenderState {
-    /// The initially configured [DrawOptions]
-    pub options: DrawOptions,
+    /// The initially configured [RenderOptions]
+    pub options: RenderOptions,
     /// The current control code (governs the overall state of the rendering loop)
     pub control_code: LoopControlCode,
     /// The current theme information
@@ -26,7 +26,7 @@ struct RenderState {
 }
 
 /// Create a new rendering thread
-pub fn new_renderer(options: DrawOptions) -> AppThread<DisplayList, ()> {
+pub fn new_renderer(options: RenderOptions) -> AppThread<DisplayList, ()> {
     let (tx, rx) = channel::<DisplayList>();
     AppThread {
         handle: Some(thread::spawn(move || render(options, rx))),
@@ -35,7 +35,7 @@ pub fn new_renderer(options: DrawOptions) -> AppThread<DisplayList, ()> {
 }
 
 /// Construct the initial rendering state
-fn initial_render_state(options: &DrawOptions) -> RenderState {
+fn initial_render_state(options: &RenderOptions) -> RenderState {
     RenderState {
         options: *options,
         control_code: LoopControlCode::Continue,
@@ -45,7 +45,7 @@ fn initial_render_state(options: &DrawOptions) -> RenderState {
 
 /// The main rendering logic flows out from here
 #[cfg(feature = "crossterm")]
-fn render(options: DrawOptions, pipeline: Receiver<DisplayList>) {
+fn render(options: RenderOptions, pipeline: Receiver<DisplayList>) {
     let mut state = initial_render_state(&options);
     if state.options.raw {
         terminal::enable_raw_mode().unwrap();

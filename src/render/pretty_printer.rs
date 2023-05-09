@@ -6,7 +6,7 @@ use chisel_json::JsonValue;
 use std::sync::mpsc::Sender;
 
 /// Options that control the output from a given printer instance
-pub struct PrettyPrintFormatOptions {
+pub struct FormatOptions {
     /// The level of indent to use
     pub indent: u16,
 
@@ -15,7 +15,7 @@ pub struct PrettyPrintFormatOptions {
 }
 
 /// Default implementation uses some sensible default for the various options
-impl Default for PrettyPrintFormatOptions {
+impl Default for FormatOptions {
     fn default() -> Self {
         Self {
             indent: 2,
@@ -30,12 +30,12 @@ pub struct PrettyPrinter {
     pub pipeline: Sender<DisplayList>,
 
     /// The formatting options
-    pub options: PrettyPrintFormatOptions,
+    pub options: FormatOptions,
 }
 
 impl PrettyPrinter {
     /// Construct a new instance, based on a supplied context reference and set of options
-    pub fn new(pipeline: Sender<DisplayList>, options: PrettyPrintFormatOptions) -> Self {
+    pub fn new(pipeline: Sender<DisplayList>, options: FormatOptions) -> Self {
         PrettyPrinter { pipeline, options }
     }
 

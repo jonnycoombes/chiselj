@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::render::options::DrawOptions;
+use crate::render::options::RenderOptions;
 use crate::state::AppChangeState;
 use clap::Parser as ClapParser;
 use cli::{AppArguments, AppCommand};
@@ -14,54 +14,35 @@ mod sources;
 mod state;
 mod threads;
 
-/// Create a new [CommandContext]
-fn new_state_and_context(render_options: DrawOptions) -> (AppChangeState, CommandContext) {
-    let state = AppChangeState::new(render_options);
-    let context = CommandContext::new(state.get_render_pipeline());
-    (state, context)
+/// Create a new [CommandContext] and execute the specified [Command] instance
+fn execute_command(cmd: &impl Command) -> i32 {
+    let render_options = RenderOptions::default();
+    let mut state = AppChangeState::new(render_options);
+    let mut context = CommandContext::new(state.get_render_pipeline());
+    match cmd.execute(&mut context) {
+        Ok(_) => {
+            state.halt_renderer();
+            0
+        }
+        Err(e) => {
+            println!("💥{}", e);
+            state.halt_renderer();
+            1
+        }
+    }
 }
 
 /// This is where the fun starts
 fn main() {
-    let mut exit_code = 0;
+    // parse the cl args
     let args = AppArguments::parse();
-    let render_options = DrawOptions::default();
 
-    match args.command {
-        AppCommand::Print(cmd) => {
-            let (mut state, mut context) = new_state_and_context(render_options);
-            match cmd.execute(&mut context) {
-                Ok(_) => (),
-                Err(e) => {
-                    exit_code = 1;
-                    println!("💥{}", e)
-                }
-            }
-            state.halt_renderer();
-        }
-        AppCommand::Filter(cmd) => {
-            let (mut state, mut context) = new_state_and_context(render_options);
-            match cmd.execute(&mut context) {
-                Ok(_) => (),
-                Err(e) => {
-                    exit_code = 1;
-                    println!("💥{}", e)
-                }
-            }
-            state.halt_renderer();
-        }
-        AppCommand::Pointers(cmd) => {
-            let (mut state, mut context) = new_state_and_context(render_options);
-            match cmd.execute(&mut context) {
-                Ok(_) => (),
-                Err(e) => {
-                    exit_code = 1;
-                    println!("💥{}", e)
-                }
-            }
-            state.halt_renderer();
-        }
-    }
+    // execute the selected command
+    let exit_code = match args.command {
+        AppCommand::Print(cmd) => execute_command(&cmd),
+        AppCommand::Filter(cmd) => execute_command(&cmd),
+        AppCommand::Pointers(cmd) => execute_command(&cmd),
+    };
 
     // return a well-behaved error code
     std::process::exit(exit_code);

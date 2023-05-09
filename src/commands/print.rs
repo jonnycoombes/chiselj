@@ -5,14 +5,16 @@ use crate::errors::ChiselResult;
 use crate::render::pretty_printer::{FormatOptions, PrettyPrinter};
 use crate::sources::{source_from_file, source_from_stdin};
 use chisel_json::coords::Coords;
-use chisel_json::dom::Parser;
+use chisel_json::dom::Parser as DomParser;
 use clap::Args;
 
 /// An [Action] responsible for just printing (pretty or otherwise) the input
 #[derive(Debug, Args)]
 #[command()]
 pub struct PrintCommand {
-    /// Source JSON file. If not specified, input is assumed to come from stdin.
+    /// Source JSON file.
+    ///
+    /// If not specified, input is assumed to come from stdin.
     #[arg(last = true, value_name = "FILE")]
     pub file: Option<PathBuf>,
 
@@ -41,7 +43,7 @@ impl Command for PrintCommand {
         }
 
         // grab a DOM parser and build ourselves some JSON
-        let parser = Parser::default();
+        let parser = DomParser::default();
         let parse_result = parser.parse_bytes(&buffer);
 
         match parse_result {

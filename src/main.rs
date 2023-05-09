@@ -2,7 +2,7 @@
 
 use crate::render::options::RenderOptions;
 use crate::state::AppChangeState;
-use clap::Parser as ClapParser;
+use clap::Parser;
 use cli::{AppArguments, AppCommand};
 use commands::{Command, CommandContext};
 

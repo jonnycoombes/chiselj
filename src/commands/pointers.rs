@@ -1,7 +1,7 @@
 use super::{Command, CommandContext};
 use crate::cl_immediate;
-use crate::errors::{ChiselError, ChiselResult};
-use crate::render::commands::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
+use crate::errors::ChiselResult;
+use crate::render::display_lists::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
 use crate::sources::{source_from_file, source_from_stdin};
 use chisel_json::sax::Parser as SaxParser;
 use clap::Args;

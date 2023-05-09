@@ -1,4 +1,4 @@
-use crate::render::commands::{ChangeState, DisplayList, DisplayListCommand, DisplayListMode};
+use crate::render::display_lists::{ChangeState, DisplayList, DisplayListCommand, DisplayListMode};
 use crate::render::options::DrawOptions;
 use crate::render::terminal::new_renderer;
 use crate::state;

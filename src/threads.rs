@@ -1,4 +1,4 @@
-use crate::render::commands::DisplayList;
+use crate::render::display_lists::DisplayList;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
 

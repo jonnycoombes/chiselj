@@ -1,7 +1,7 @@
 //! Pretty-printer logic for use by various commands
 use crate::cl_immediate;
 use crate::errors::{ChiselError, ChiselResult};
-use crate::render::commands::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
+use crate::render::display_lists::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
 use chisel_json::JsonValue;
 use std::sync::mpsc::Sender;
 

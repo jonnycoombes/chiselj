@@ -1,4 +1,4 @@
-use crate::{errors::ChiselResult, render::commands::DisplayList};
+use crate::{errors::ChiselResult, render::display_lists::DisplayList};
 use std::sync::mpsc::Sender;
 
 pub mod filter;

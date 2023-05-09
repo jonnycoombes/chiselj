@@ -1,5 +1,5 @@
 //! The renderer for text UIs
-use super::commands::{ChangeState, DisplayList, DisplayListCommand, Draw};
+use super::display_lists::{ChangeState, DisplayList, DisplayListCommand, DisplayListMode, Draw};
 use super::{options::DrawOptions, themes::Theme};
 use crate::threads::AppThread;
 use crossterm::terminal;
@@ -45,8 +45,6 @@ fn initial_render_state(options: &DrawOptions) -> DrawChangeState {
 /// The main rendering logic flows out from here
 #[cfg(feature = "crossterm")]
 fn render(options: DrawOptions, pipeline: Receiver<DisplayList>) {
-    use super::commands::DisplayListMode;
-
     let mut state = initial_render_state(&options);
     if state.options.raw {
         terminal::enable_raw_mode().unwrap();

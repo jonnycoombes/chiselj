@@ -16,7 +16,7 @@ enum LoopControlCode {
 
 /// Used to track the internal render state
 #[derive(Debug, Copy, Clone)]
-struct DrawChangeState {
+struct RenderState {
     /// The initially configured [DrawOptions]
     pub options: DrawOptions,
     /// The current control code (governs the overall state of the rendering loop)
@@ -35,8 +35,8 @@ pub fn new_renderer(options: DrawOptions) -> AppThread<DisplayList, ()> {
 }
 
 /// Construct the initial rendering state
-fn initial_render_state(options: &DrawOptions) -> DrawChangeState {
-    DrawChangeState {
+fn initial_render_state(options: &DrawOptions) -> RenderState {
+    RenderState {
         options: *options,
         control_code: LoopControlCode::Continue,
         theme: Theme { indent: ' ' },
@@ -81,13 +81,13 @@ fn render(options: DrawOptions, pipeline: Receiver<DisplayList>) {
 /// Update the current rendering state with information relating to cursor position, terminal size
 /// etc...
 #[inline]
-fn update_render_state(state: &mut DrawChangeState) -> DrawChangeState {
+fn update_render_state(state: &mut RenderState) -> RenderState {
     *state
 }
 
 /// Handle any [DisplayListCommand::ChangeState] commands
 #[cfg(feature = "crossterm")]
-fn handle_state_command(state: &mut DrawChangeState, cmd: &ChangeState) -> DrawChangeState {
+fn handle_state_command(state: &mut RenderState, cmd: &ChangeState) -> RenderState {
     match cmd {
         ChangeState::Terminate => state.control_code = LoopControlCode::Terminate,
         _ => (),
@@ -97,11 +97,7 @@ fn handle_state_command(state: &mut DrawChangeState, cmd: &ChangeState) -> DrawC
 
 /// Handle any [DisplayListCommand::Draw] commands
 #[cfg(feature = "crossterm")]
-fn handle_render_command(
-    out: &mut dyn Write,
-    state: &mut DrawChangeState,
-    cmd: &Draw,
-) -> DrawChangeState {
+fn handle_render_command(out: &mut dyn Write, state: &mut RenderState, cmd: &Draw) -> RenderState {
     let _result = match cmd {
         Draw::NewLine => write!(out, "\n"),
         Draw::Indent(n) => {

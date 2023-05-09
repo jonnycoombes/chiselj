@@ -1,5 +1,9 @@
 use crate::{errors::ChiselResult, render::commands::CommandList};
 use std::sync::mpsc::Sender;
+/// The default filter action
+pub mod filter;
+/// The default pointers action
+pub mod pointers;
 /// The default print action
 pub mod print;
 

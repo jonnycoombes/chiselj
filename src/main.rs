@@ -2,6 +2,8 @@
 
 use crate::render::options::RenderOptions;
 use crate::state::AppState;
+use actions::filter::FilterAction;
+use actions::pointers::PointersAction;
 use actions::print::PrintAction;
 use actions::{Action, ActionContext};
 use clap::Parser as ClapParser;
@@ -50,11 +52,29 @@ fn main() {
             }
             state.halt_renderer();
         }
-        ActionCommand::Filter(_args) => {
-            println!("filter selected")
+        ActionCommand::Filter(args) => {
+            let (mut state, mut context) = new_state_and_context(&args, render_options);
+            let mut action = FilterAction {};
+            match action.execute(&mut context) {
+                Ok(_) => (),
+                Err(e) => {
+                    exit_code = 1;
+                    println!("💥{}", e)
+                }
+            }
+            state.halt_renderer();
         }
-        ActionCommand::Pointers(_args) => {
-            println!("pointers selected")
+        ActionCommand::Pointers(args) => {
+            let (mut state, mut context) = new_state_and_context(&args, render_options);
+            let mut action = PointersAction::default();
+            match action.execute(&mut context) {
+                Ok(_) => (),
+                Err(e) => {
+                    exit_code = 1;
+                    println!("💥{}", e)
+                }
+            }
+            state.halt_renderer();
         }
     }
 

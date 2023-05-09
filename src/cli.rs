@@ -20,7 +20,7 @@ pub enum ActionCommand {
     /// Filtering
     Filter(FilterArgs),
     /// Inspecting and manipulating JSON pointers
-    Pointers(PointerArgs),
+    Pointers(PointersArgs),
 }
 
 #[derive(Debug, Args)]
@@ -44,14 +44,14 @@ pub struct PrintArgs {
 
 #[derive(Debug, Args)]
 pub struct FilterArgs {
-    /// (Optional) input file.
-    #[arg(short, long, value_name = "FILE")]
+    /// Source JSON file. If not specified, input is assumed to come from stdin.
+    #[arg(last = true, value_name = "FILE")]
     pub file: Option<PathBuf>,
 }
 
 #[derive(Debug, Args)]
-pub struct PointerArgs {
-    /// (Optional) input file.
-    #[arg(short, long, value_name = "FILE")]
+pub struct PointersArgs {
+    /// Source JSON file. If not specified, input is assumed to come from stdin.
+    #[arg(last = true, value_name = "FILE")]
     pub file: Option<PathBuf>,
 }

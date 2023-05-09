@@ -1,7 +1,7 @@
 use super::{Command, CommandContext};
 use crate::cl_immediate;
 use crate::errors::{ChiselError, ChiselResult};
-use crate::render::commands::{CommandList, CommandListMode, PipelineCommand, RenderCommand};
+use crate::render::commands::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
 use crate::sources::{source_from_file, source_from_stdin};
 use chisel_json::sax::Parser as SaxParser;
 use clap::Args;
@@ -33,10 +33,9 @@ impl Command for PointersCommand {
                 Some(p) => {
                     let s = p.as_str();
                     if !pointers.contains(&s.to_string()) {
-                        let _ = context.render_pipeline.send(cl_immediate!(
-                            RenderCommand::Text(format!("{}", p)),
-                            RenderCommand::NewLine
-                        ));
+                        let _ = context
+                            .render_pipeline
+                            .send(cl_immediate!(Draw::Text(format!("{}", p)), Draw::NewLine));
                         pointers.insert(s.to_string());
                     }
                 }

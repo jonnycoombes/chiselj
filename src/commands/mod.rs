@@ -1,4 +1,4 @@
-use crate::{errors::ChiselResult, render::commands::CommandList};
+use crate::{errors::ChiselResult, render::commands::DisplayList};
 use std::sync::mpsc::Sender;
 
 pub mod filter;
@@ -9,12 +9,18 @@ pub mod print;
 #[derive(Debug)]
 pub struct CommandContext {
     /// The rendering pipeline
-    pub render_pipeline: Sender<CommandList>,
+    render_pipeline: Sender<DisplayList>,
 }
 
 impl CommandContext {
+    pub fn new(render_pipeline: Sender<DisplayList>) -> Self {
+        CommandContext {
+            render_pipeline: render_pipeline.clone(),
+        }
+    }
+
     /// Clone the render pipeline
-    pub fn clone_render_pipeline(&self) -> Sender<CommandList> {
+    pub fn clone_render_pipeline(&self) -> Sender<DisplayList> {
         self.render_pipeline.clone()
     }
 }

@@ -1,5 +1,5 @@
-use crate::render::commands::{CommandList, CommandListMode, PipelineCommand, StateCommand};
-use crate::render::options::RenderOptions;
+use crate::render::commands::{ChangeState, DisplayList, DisplayListCommand, DisplayListMode};
+use crate::render::options::DrawOptions;
 use crate::render::terminal::new_renderer;
 use crate::state;
 use crate::threads::AppThreads;
@@ -7,15 +7,15 @@ use std::sync::mpsc::Sender;
 
 /// Struct representing the global application state
 #[derive(Debug)]
-pub struct AppState {
+pub struct AppChangeState {
     /// Worker threads
     threads: AppThreads,
 }
 
-impl AppState {
+impl AppChangeState {
     /// Create a new instance of the global application state
-    pub fn new(render_options: RenderOptions) -> Self {
-        AppState {
+    pub fn new(render_options: DrawOptions) -> Self {
+        AppChangeState {
             threads: AppThreads {
                 renderer: new_renderer(render_options),
             },
@@ -23,18 +23,18 @@ impl AppState {
     }
 
     /// Get a clone of the transmitter for the rendering thread
-    pub fn get_render_pipeline(&self) -> Sender<CommandList> {
+    pub fn get_render_pipeline(&self) -> Sender<DisplayList> {
         self.threads.renderer.sink.clone()
     }
 
-    /// Halt the rendering thread by throwing it a [StateCommand::Terminate]
+    /// Halt the rendering thread by throwing it a [ChangeState::Terminate]
     pub fn halt_renderer(&mut self) {
         self.threads
             .renderer
             .sink
-            .send(CommandList {
-                mode: CommandListMode::Immediate,
-                cmds: vec![state!(StateCommand::Terminate)],
+            .send(DisplayList {
+                mode: DisplayListMode::Immediate,
+                cmds: vec![state!(ChangeState::Terminate)],
             })
             .expect("Failed to send terminate op to renderer");
         self.threads.renderer.join();

@@ -17,7 +17,7 @@ pub enum ChiselError {
     /// Not a TTY
     NoTty,
     /// Failed to send to the rendering pipeline
-    RenderPipelineSendFailed,
+    DisplayListFailed,
 }
 
 impl Display for ChiselError {
@@ -30,7 +30,7 @@ impl Display for ChiselError {
                 "Expecting piped input, but doesn't look like there is any..."
             ),
             Self::NoTty => write!(f, "Not a tty!"),
-            Self::RenderPipelineSendFailed => write!(f, "Failed to send command list to renderer"),
+            Self::DisplayListFailed => write!(f, "Failed to send display list to renderer"),
         }
     }
 }

@@ -22,7 +22,7 @@ pub enum Alignment {
 
 /// Primitive drawing coammands
 #[derive(Debug, Clone, PartialEq)]
-pub enum RenderCommand {
+pub enum Draw {
     /// Output a newline
     NewLine,
     /// Indent by a positive number of chars
@@ -39,9 +39,9 @@ pub enum RenderCommand {
     Slice(&'static str),
 }
 
-/// Render state mutation commands
+/// Draw state mutation commands
 #[derive(Debug, PartialEq)]
-pub enum StateCommand {
+pub enum ChangeState {
     /// Clear the current buffer
     Clear,
     /// Set the render cursor position
@@ -69,18 +69,18 @@ pub enum StateCommand {
 /// A pipeline command is basically just a sum type, either a state related command, or a render
 /// command
 #[derive(Debug)]
-pub enum PipelineCommand {
-    /// A command to mutate the state of the pipeline
-    State(StateCommand),
-    /// Render, using a specific op code
-    Render(RenderCommand),
+pub enum DisplayListCommand {
+    /// A command to mutate render state
+    ChangeState(ChangeState),
+    /// Draw, using a specific op code
+    Draw(Draw),
 }
 
 /// Shorthand for creating state operations
 #[macro_export]
 macro_rules! state {
     ($op : expr) => {
-        PipelineCommand::State($op)
+        DisplayListCommand::ChangeState($op)
     };
 }
 
@@ -88,42 +88,42 @@ macro_rules! state {
 #[macro_export]
 macro_rules! render {
     ($op : expr) => {
-        PipelineCommand::Render($op)
+        DisplayListCommand::Draw($op)
     };
 }
 
 /// A display list can either be immediate (meaning render immediately) or deferred (meaning that
 /// the renderer may decide to not render immediately)
 #[derive(Debug, PartialEq)]
-pub enum CommandListMode {
+pub enum DisplayListMode {
     /// The display list should be rendered immediately
     Immediate,
     /// The display list may be deferred and rendered later
     Deferred,
 }
 
-/// A display list is currently just a vector of [RenderCommand]s
+/// A display list is currently just a vector of [Draw]s
 #[derive(Debug)]
-pub struct CommandList {
+pub struct DisplayList {
     /// The mode for the display list
-    pub mode: CommandListMode,
+    pub mode: DisplayListMode,
     /// The operations associated with the display list
-    pub cmds: Vec<PipelineCommand>,
+    pub cmds: Vec<DisplayListCommand>,
 }
 
 /// Helper macro for generating an immediate mode [CommandList]
 #[macro_export]
 macro_rules! cl_immediate {
     ($($c : expr),+) => {
-        CommandList {
-            mode: CommandListMode::Immediate,
-            cmds: vec![$(PipelineCommand::Render($c)),*],
+        DisplayList {
+            mode: DisplayListMode::Immediate,
+            cmds: vec![$(DisplayListCommand::Draw($c)),*],
         }
     };
     ($($c : expr,)+) => {
-        CommandList {
-            mode: CommandListMode::Immediate,
-            cmds: vec![$(PipelineCommand::Render($c)),*],
+        DisplayList {
+            mode: DisplayListMode::Immediate,
+            cmds: vec![$(DisplayListCommand::Draw($c)),*],
         }
     };
 }
@@ -132,15 +132,15 @@ macro_rules! cl_immediate {
 #[macro_export]
 macro_rules! cl_deferred {
     ($($c : expr),+) => {
-        CommandList {
-            mode: CommandListMode::Deferred,
-            cmds: vec![$(PipelineCommand::Render($c)),*],
+        DisplayList {
+            mode: DisplayListMode::Deferred,
+            cmds: vec![$(DisplayListCommand::Draw($c)),*],
         }
     };
     ($($c : expr,)+) => {
-        CommandList {
+        DisplayList {
             mode: CommandListMode::Deferred,
-            cmds: vec![$(PipelineCommand::Render($c)),*],
+            cmds: vec![$(DisplayListCommand::Draw($c)),*],
         }
     };
 }

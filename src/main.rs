@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use crate::render::options::RenderOptions;
-use crate::state::AppState;
+use crate::render::options::DrawOptions;
+use crate::state::AppChangeState;
 use clap::Parser as ClapParser;
 use cli::{AppArguments, AppCommand};
 use commands::{Command, CommandContext};
@@ -15,11 +15,9 @@ mod state;
 mod threads;
 
 /// Create a new [CommandContext]
-fn new_state_and_context(render_options: RenderOptions) -> (AppState, CommandContext) {
-    let state = AppState::new(render_options);
-    let context = CommandContext {
-        render_pipeline: state.get_render_pipeline(),
-    };
+fn new_state_and_context(render_options: DrawOptions) -> (AppChangeState, CommandContext) {
+    let state = AppChangeState::new(render_options);
+    let context = CommandContext::new(state.get_render_pipeline());
     (state, context)
 }
 
@@ -27,7 +25,7 @@ fn new_state_and_context(render_options: RenderOptions) -> (AppState, CommandCon
 fn main() {
     let mut exit_code = 0;
     let args = AppArguments::parse();
-    let render_options = RenderOptions::default();
+    let render_options = DrawOptions::default();
 
     match args.command {
         AppCommand::Print(cmd) => {

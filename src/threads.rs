@@ -1,4 +1,4 @@
-use crate::render::commands::CommandList;
+use crate::render::commands::DisplayList;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
 
@@ -22,5 +22,5 @@ impl<Message, Result> AppThread<Message, Result> {
 #[derive(Debug)]
 pub struct AppThreads {
     /// The current rendering thread
-    pub renderer: AppThread<CommandList, ()>,
+    pub renderer: AppThread<DisplayList, ()>,
 }

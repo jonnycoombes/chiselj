@@ -2,32 +2,22 @@
 
 use crate::render::options::RenderOptions;
 use crate::state::AppState;
-use actions::filter::FilterAction;
-use actions::pointers::PointersAction;
-use actions::print::PrintAction;
-use actions::{Action, ActionContext};
 use clap::Parser as ClapParser;
-use cli::{ActionCommand, Arguments};
+use cli::{AppArguments, AppCommand};
+use commands::{Command, CommandContext};
 
-mod actions;
 mod cli;
+mod commands;
 mod errors;
 mod render;
 mod sources;
 mod state;
 mod threads;
 
-/// Create a new [AppState] and [ActionContext] based on:
-///
-/// 1. A specialised set of command arguments
-/// 2. A configuration for the renderer ([RenderOptions])
-fn new_state_and_context<'a, T>(
-    args: &'a T,
-    render_options: RenderOptions,
-) -> (AppState, ActionContext<'a, T>) {
+/// Create a new [CommandContext]
+fn new_state_and_context(render_options: RenderOptions) -> (AppState, CommandContext) {
     let state = AppState::new(render_options);
-    let context = ActionContext {
-        args,
+    let context = CommandContext {
         render_pipeline: state.get_render_pipeline(),
     };
     (state, context)
@@ -36,14 +26,13 @@ fn new_state_and_context<'a, T>(
 /// This is where the fun starts
 fn main() {
     let mut exit_code = 0;
-    let args = Arguments::parse();
+    let args = AppArguments::parse();
     let render_options = RenderOptions::default();
 
     match args.command {
-        ActionCommand::Print(args) => {
-            let (mut state, mut context) = new_state_and_context(&args, render_options);
-            let mut action = PrintAction {};
-            match action.execute(&mut context) {
+        AppCommand::Print(cmd) => {
+            let (mut state, mut context) = new_state_and_context(render_options);
+            match cmd.execute(&mut context) {
                 Ok(_) => (),
                 Err(e) => {
                     exit_code = 1;
@@ -52,10 +41,9 @@ fn main() {
             }
             state.halt_renderer();
         }
-        ActionCommand::Filter(args) => {
-            let (mut state, mut context) = new_state_and_context(&args, render_options);
-            let mut action = FilterAction {};
-            match action.execute(&mut context) {
+        AppCommand::Filter(cmd) => {
+            let (mut state, mut context) = new_state_and_context(render_options);
+            match cmd.execute(&mut context) {
                 Ok(_) => (),
                 Err(e) => {
                     exit_code = 1;
@@ -64,10 +52,9 @@ fn main() {
             }
             state.halt_renderer();
         }
-        ActionCommand::Pointers(args) => {
-            let (mut state, mut context) = new_state_and_context(&args, render_options);
-            let mut action = PointersAction::default();
-            match action.execute(&mut context) {
+        AppCommand::Pointers(cmd) => {
+            let (mut state, mut context) = new_state_and_context(render_options);
+            match cmd.execute(&mut context) {
                 Ok(_) => (),
                 Err(e) => {
                     exit_code = 1;

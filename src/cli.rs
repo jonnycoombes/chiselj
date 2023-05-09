@@ -1,5 +1,8 @@
-use clap::{crate_version, Args, Parser, Subcommand};
-use std::{ffi::OsString, path::PathBuf};
+use clap::{crate_version, Parser, Subcommand};
+
+use crate::commands::filter::FilterCommand;
+use crate::commands::pointers::PointersCommand;
+use crate::commands::print::PrintCommand;
 
 /// Top level command line arguments and configuration settings
 #[derive(Parser)]
@@ -7,51 +10,18 @@ use std::{ffi::OsString, path::PathBuf};
 #[command(author = "Jonny Coombes <jcoombes@jcs-software.co.uk>")]
 #[command(about = "A simple command line JSON wrangler", long_about = None)]
 #[command(version = crate_version!())]
-pub struct Arguments {
+pub struct AppArguments {
     #[command(subcommand)]
-    pub command: ActionCommand,
+    pub command: AppCommand,
 }
 
 /// Enumeration of available commands and their associated arguments
 #[derive(Debug, Subcommand)]
-pub enum ActionCommand {
+pub enum AppCommand {
     /// Pretty printing
-    Print(PrintArgs),
+    Print(PrintCommand),
     /// Filtering
-    Filter(FilterArgs),
+    Filter(FilterCommand),
     /// Inspecting and manipulating JSON pointers
-    Pointers(PointersArgs),
-}
-
-#[derive(Debug, Args)]
-pub struct PrintArgs {
-    /// Source JSON file. If not specified, input is assumed to come from stdin.
-    #[arg(last = true, value_name = "FILE")]
-    pub file: Option<OsString>,
-
-    /// Indent space count
-    ///
-    /// Object keys and array values are idented by this amount plus the parent identation amount
-    #[arg(short, long, value_name = "n", default_value = "2")]
-    pub indent: u16,
-
-    /// KV padding count
-    ///
-    /// The number of spaces added to each side of the ":" character in a <key> : <value> pair
-    #[arg(short, long, value_name = "n", default_value = "1")]
-    pub kvpadding: u16,
-}
-
-#[derive(Debug, Args)]
-pub struct FilterArgs {
-    /// Source JSON file. If not specified, input is assumed to come from stdin.
-    #[arg(last = true, value_name = "FILE")]
-    pub file: Option<PathBuf>,
-}
-
-#[derive(Debug, Args)]
-pub struct PointersArgs {
-    /// Source JSON file. If not specified, input is assumed to come from stdin.
-    #[arg(last = true, value_name = "FILE")]
-    pub file: Option<PathBuf>,
+    Pointers(PointersCommand),
 }

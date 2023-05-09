@@ -1,31 +1,26 @@
 use crate::{errors::ChiselResult, render::commands::CommandList};
 use std::sync::mpsc::Sender;
-/// The default filter action
+
 pub mod filter;
-/// The default pointers action
 pub mod pointers;
-/// The default print action
 pub mod print;
 
 /// An action context provides all the information and configuration needed to process an action
 #[derive(Debug)]
-pub struct ActionContext<'a, Args> {
-    /// The parameters for the given action
-    pub args: &'a Args,
-
+pub struct CommandContext {
     /// The rendering pipeline
     pub render_pipeline: Sender<CommandList>,
 }
 
-impl<'a, Args> ActionContext<'a, Args> {
+impl CommandContext {
     /// Clone the render pipeline
     pub fn clone_render_pipeline(&self) -> Sender<CommandList> {
         self.render_pipeline.clone()
     }
 }
 
-/// An action is
-pub trait Action<Args, Output> {
+/// Defines an interface for commands supported by the application
+pub trait Command {
     /// Execute the action, taking in a reference to
-    fn execute<'a, 'b>(&mut self, context: &mut ActionContext<'a, Args>) -> ChiselResult<Output>;
+    fn execute(&self, context: &mut CommandContext) -> ChiselResult<()>;
 }

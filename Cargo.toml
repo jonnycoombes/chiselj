@@ -2,6 +2,13 @@
 name = "chisel"
 version = "0.1.2"
 edition = "2021"
+authors = ["Jonny Coombes <jcoombes@jcs-software.co.uk>"]
+rust-version = "1.56"
+description = "JSON command line utility"
+license = "MIT OR Apache-2.0"
+keywords = ["json", "cli"]
+categories = ["text-processing", "command-line-interface", "command-line-utilities"]
+repository = "https://github.com/jonnycoombes/chisel"
 
 [dependencies]
 clap = {version = "4.1.6", features = ["derive", "cargo"]}

@@ -1,9 +1,10 @@
 use crate::{errors::ChiselResult, render::display_lists::DisplayList};
 use std::sync::mpsc::Sender;
 
-pub mod filter;
-pub mod pointers;
-pub mod print;
+pub(crate) mod filter;
+pub(crate) mod pointers;
+pub(crate) mod print;
+pub(crate) mod sax;
 
 /// An action context provides all the information and configuration needed to process an action
 #[derive(Debug)]

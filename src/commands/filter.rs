@@ -12,7 +12,7 @@ pub struct FilterCommand {
 }
 
 impl Command for FilterCommand {
-    fn execute(&self, _context: &mut super::CommandContext) -> crate::errors::ChiselResult<()> {
+    fn execute(&mut self, _context: &mut super::CommandContext) -> crate::errors::ChiselResult<()> {
         todo!()
     }
 }

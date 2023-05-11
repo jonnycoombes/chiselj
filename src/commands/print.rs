@@ -33,7 +33,7 @@ pub struct PrintCommand {
 
 impl Command for PrintCommand {
     /// Execute the print action
-    fn execute(&self, context: &mut CommandContext) -> ChiselResult<()> {
+    fn execute(&mut self, context: &mut CommandContext) -> ChiselResult<()> {
         // sort out some argument related stuff and populate the buffer
         let mut buffer: Vec<u8> = vec![];
         if let Some(path) = &self.file {

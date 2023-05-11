@@ -28,5 +28,5 @@ impl CommandContext {
 /// Defines an interface for commands supported by the application
 pub trait Command {
     /// Execute the action, taking in a reference to
-    fn execute(&self, context: &mut CommandContext) -> ChiselResult<()>;
+    fn execute(&mut self, context: &mut CommandContext) -> ChiselResult<()>;
 }

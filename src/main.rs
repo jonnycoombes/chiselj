@@ -15,7 +15,7 @@ mod state;
 mod threads;
 
 /// Create a new [CommandContext] and execute the specified [Command] instance
-fn execute_command(cmd: &impl Command) -> i32 {
+fn execute_command(cmd: &mut impl Command) -> i32 {
     let render_options = RenderOptions::default();
     let mut state = AppChangeState::new(render_options);
     let mut context = CommandContext::new(state.get_render_pipeline());
@@ -39,9 +39,9 @@ fn main() {
 
     // execute the selected command
     let exit_code = match args.command {
-        AppCommand::Print(cmd) => execute_command(&cmd),
-        AppCommand::Filter(cmd) => execute_command(&cmd),
-        AppCommand::Pointers(cmd) => execute_command(&cmd),
+        AppCommand::Print(mut cmd) => execute_command(&mut cmd),
+        AppCommand::Filter(mut cmd) => execute_command(&mut cmd),
+        AppCommand::Pointers(mut cmd) => execute_command(&mut cmd),
     };
 
     // return a well-behaved error code

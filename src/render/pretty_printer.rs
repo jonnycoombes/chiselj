@@ -1,12 +1,12 @@
 //! Pretty-printer logic for use by various commands
 use crate::cl_immediate;
 use crate::errors::{ChiselError, ChiselResult};
-use crate::render::commands::{CommandList, CommandListMode, PipelineCommand, RenderCommand};
+use crate::render::display_lists::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
 use chisel_json::JsonValue;
 use std::sync::mpsc::Sender;
 
 /// Options that control the output from a given printer instance
-pub struct PrettyPrintFormatOptions {
+pub struct FormatOptions {
     /// The level of indent to use
     pub indent: u16,
 
@@ -15,7 +15,7 @@ pub struct PrettyPrintFormatOptions {
 }
 
 /// Default implementation uses some sensible default for the various options
-impl Default for PrettyPrintFormatOptions {
+impl Default for FormatOptions {
     fn default() -> Self {
         Self {
             indent: 2,
@@ -27,24 +27,24 @@ impl Default for PrettyPrintFormatOptions {
 /// Pretty printer for [JsonValue]s
 pub struct PrettyPrinter {
     /// The [ActionContext] associated with the printer
-    pub pipeline: Sender<CommandList>,
+    pub pipeline: Sender<DisplayList>,
 
     /// The formatting options
-    pub options: PrettyPrintFormatOptions,
+    pub options: FormatOptions,
 }
 
 impl PrettyPrinter {
     /// Construct a new instance, based on a supplied context reference and set of options
-    pub fn new(pipeline: Sender<CommandList>, options: PrettyPrintFormatOptions) -> Self {
+    pub fn new(pipeline: Sender<DisplayList>, options: FormatOptions) -> Self {
         PrettyPrinter { pipeline, options }
     }
 
-    /// Chuck a [CommandList] at the rendering pipeline and perform error conversion if necessary
+    /// Chuck a [DisplayList] at the rendering pipeline and perform error conversion if necessary
     #[inline]
-    fn submit_command_list(&self, cmds: CommandList) -> ChiselResult<()> {
+    fn submit_command_list(&self, cmds: DisplayList) -> ChiselResult<()> {
         match self.pipeline.send(cmds) {
             Ok(_) => Ok(()),
-            Err(_) => Err(ChiselError::RenderPipelineSendFailed),
+            Err(_) => Err(ChiselError::DisplayListFailed),
         }
     }
 
@@ -53,7 +53,7 @@ impl PrettyPrinter {
         self.render_json_value(0, value)
     }
 
-    /// Render a [JsonValue]
+    /// Draw a [JsonValue]
     fn render_json_value(&self, level: u16, value: JsonValue) -> ChiselResult<()> {
         match value {
             JsonValue::Object(kids) => self.render_json_object(level, kids),
@@ -66,17 +66,20 @@ impl PrettyPrinter {
         }
     }
 
-    /// Render a json array
+    /// Draw a json array
     fn render_json_array(&self, level: u16, kids: Vec<JsonValue>) -> ChiselResult<()> {
-        // opening bracket
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Char('['),
-            RenderCommand::NewLine
-        ))?;
-
         let kidcount = kids.len();
+        let empty = kids.is_empty();
+
+        // opening bracket
+        if !empty {
+            self.submit_command_list(cl_immediate!(Draw::Char('['), Draw::NewLine))?;
+        } else {
+            self.submit_command_list(cl_immediate!(Draw::Char('['),))?;
+        }
+
         for (i, value) in kids.into_iter().enumerate() {
-            self.submit_command_list(cl_immediate!(RenderCommand::Indent(
+            self.submit_command_list(cl_immediate!(Draw::Indent(
                 (level + 1) * self.options.indent
             )))?;
             match value {
@@ -89,61 +92,64 @@ impl PrettyPrinter {
                 JsonValue::Null => self.render_json_null()?,
             }
             if i != kidcount - 1 {
-                self.submit_command_list(cl_immediate!(
-                    RenderCommand::Char(','),
-                    RenderCommand::NewLine
-                ))?
+                self.submit_command_list(cl_immediate!(Draw::Char(','), Draw::NewLine))?
             } else {
-                self.submit_command_list(cl_immediate!(RenderCommand::NewLine))?
+                self.submit_command_list(cl_immediate!(Draw::NewLine))?
             }
         }
 
         // closing bracket
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indent),
-            RenderCommand::Char(']'),
-        ))
-    }
-
-    /// Render a string value
-    fn render_json_string(&self, value: String) -> ChiselResult<()> {
-        self.submit_command_list(cl_immediate!(RenderCommand::Text(value)))
-    }
-
-    /// Render an integer value
-    fn render_json_integer(&self, value: i64) -> ChiselResult<()> {
-        self.submit_command_list(cl_immediate!(RenderCommand::Text(value.to_string())))
-    }
-
-    /// Render an float value
-    fn render_json_float(&self, value: f64) -> ChiselResult<()> {
-        self.submit_command_list(cl_immediate!(RenderCommand::Text(value.to_string())))
-    }
-
-    /// Render a boolean value
-    fn render_json_boolean(&self, value: bool) -> ChiselResult<()> {
-        if value {
-            self.submit_command_list(cl_immediate!(RenderCommand::Slice("true")))
+        if !empty {
+            self.submit_command_list(cl_immediate!(
+                Draw::Indent(level * self.options.indent),
+                Draw::Char(']'),
+            ))
         } else {
-            self.submit_command_list(cl_immediate!(RenderCommand::Slice("false")))
+            self.submit_command_list(cl_immediate!(Draw::Char(']'),))
         }
     }
 
-    /// Render a null value
+    /// Draw a string value
+    fn render_json_string(&self, value: String) -> ChiselResult<()> {
+        self.submit_command_list(cl_immediate!(Draw::Text(value)))
+    }
+
+    /// Draw an integer value
+    fn render_json_integer(&self, value: i64) -> ChiselResult<()> {
+        self.submit_command_list(cl_immediate!(Draw::Text(value.to_string())))
+    }
+
+    /// Draw an float value
+    fn render_json_float(&self, value: f64) -> ChiselResult<()> {
+        self.submit_command_list(cl_immediate!(Draw::Text(value.to_string())))
+    }
+
+    /// Draw a boolean value
+    fn render_json_boolean(&self, value: bool) -> ChiselResult<()> {
+        if value {
+            self.submit_command_list(cl_immediate!(Draw::Slice("true")))
+        } else {
+            self.submit_command_list(cl_immediate!(Draw::Slice("false")))
+        }
+    }
+
+    /// Draw a null value
     fn render_json_null(&self) -> ChiselResult<()> {
-        self.submit_command_list(cl_immediate!(RenderCommand::Slice("null")))
+        self.submit_command_list(cl_immediate!(Draw::Slice("null")))
     }
 
     /// Surround an object with braces at the correct indent level, and recursively render
     /// children at the next indent level
     fn render_json_object(&self, level: u16, kids: Vec<(String, JsonValue)>) -> ChiselResult<()> {
         let kidcount = kids.len();
+        let empty = kids.is_empty();
 
         // opening brace
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Char('{'),
-            RenderCommand::NewLine
-        ))?;
+        if !empty {
+            self.submit_command_list(cl_immediate!(Draw::Char('{'), Draw::NewLine))?;
+        } else {
+            self.submit_command_list(cl_immediate!(Draw::Char('{'),))?;
+        }
 
         // render the kids
         for (i, (key, value)) in kids.into_iter().enumerate() {
@@ -155,10 +161,14 @@ impl PrettyPrinter {
         }
 
         // closing brace with optional newline
-        self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indent),
-            RenderCommand::Char('}'),
-        ))
+        if !empty {
+            self.submit_command_list(cl_immediate!(
+                Draw::Indent(level * self.options.indent),
+                Draw::Char('}'),
+            ))
+        } else {
+            self.submit_command_list(cl_immediate!(Draw::Char('}'),))
+        }
     }
 
     /// Output a KV pair from within an object
@@ -171,11 +181,11 @@ impl PrettyPrinter {
     ) -> ChiselResult<()> {
         // the key
         self.submit_command_list(cl_immediate!(
-            RenderCommand::Indent(level * self.options.indent),
-            RenderCommand::Text(key.to_string()),
-            RenderCommand::Indent(self.options.kvpadding),
-            RenderCommand::Slice(":"),
-            RenderCommand::Indent(self.options.kvpadding),
+            Draw::Indent(level * self.options.indent),
+            Draw::Text(key.to_string()),
+            Draw::Indent(self.options.kvpadding),
+            Draw::Slice(":"),
+            Draw::Indent(self.options.kvpadding),
         ))?;
 
         // the value
@@ -183,12 +193,9 @@ impl PrettyPrinter {
 
         // add trailing comma as required
         if trailing {
-            self.submit_command_list(cl_immediate!(
-                RenderCommand::Char(','),
-                RenderCommand::NewLine
-            ))?;
+            self.submit_command_list(cl_immediate!(Draw::Char(','), Draw::NewLine))?;
         } else {
-            self.submit_command_list(cl_immediate!(RenderCommand::NewLine))?;
+            self.submit_command_list(cl_immediate!(Draw::NewLine))?;
         }
 
         Ok(())

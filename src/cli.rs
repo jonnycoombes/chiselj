@@ -18,10 +18,10 @@ pub struct AppArguments {
 /// Enumeration of available commands and their associated arguments
 #[derive(Debug, Subcommand)]
 pub enum AppCommand {
-    /// Pretty printing
+    #[command(about = "Pretty printing JSON DOM structures", long_about = None)]
     Print(PrintCommand),
-    /// Filtering
+    #[command(about = "Filtering JSON DOM structures", long_about = None)]
     Filter(FilterCommand),
-    /// Inspecting and manipulating JSON pointers
+    #[command(about = "Inspecting JSON pointers", long_about = None)]
     Pointers(PointersCommand),
 }

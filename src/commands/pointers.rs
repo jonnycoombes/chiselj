@@ -12,7 +12,6 @@ use std::path::PathBuf;
 
 /// An [Command] responsible for filtering the input
 #[derive(Debug, Args)]
-#[command(about = "Does awesome things", long_about = None)]
 pub struct PointersCommand {
     /// Source JSON file.
     ///

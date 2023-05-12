@@ -12,6 +12,7 @@ use std::path::PathBuf;
 
 /// An [Command] responsible for filtering the input
 #[derive(Debug, Args)]
+#[command(about = "Does awesome things", long_about = None)]
 pub struct PointersCommand {
     /// Source JSON file.
     ///
@@ -45,6 +46,8 @@ impl PointersCommand {
                 Some(p) => {
                     let _ = context.render_pipeline.send(cl_immediate!(
                         Draw::Text(format!("{}", evt.span.start.line)),
+                        Draw::Char(self.delimiter),
+                        Draw::Text(format!("{}", evt.span.start.column)),
                         Draw::Char(self.delimiter),
                         Draw::Char(matched_to_char(&evt.matched)),
                         Draw::Char(self.delimiter),

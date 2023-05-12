@@ -2,6 +2,16 @@
 
 All the most recent changes are summarised and grouped below:
 
+## [unreleased]
+
+### Features
+
+- Upgraded `chisel-json` to version 0.1.22
+- Added start and end coordinates to pointer output
+- Started adding sane documentation around available commands
+- Renamed package name to chiselj in order to avoid collisions
+- Added basic package information to Cargo.toml
+
 ## [0.1.2] - 2023-05-11
 
 ### Features

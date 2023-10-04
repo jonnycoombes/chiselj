@@ -12,8 +12,8 @@ repository = "https://github.com/jonnycoombes/chiselj"
 
 [dependencies]
 clap = {version = "4.1.6", features = ["derive", "cargo"]}
-chisel-json = {path="../chisel-json/" }
-crossterm = {version = "0.26.1"}
+chisel-json = {version = "0.1.23" }
+crossterm = {version = "0.27.0" }
 atty = {version = "0.2.14"}
 
 [features]

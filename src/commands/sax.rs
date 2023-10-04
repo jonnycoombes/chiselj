@@ -68,7 +68,9 @@ pub(crate) fn matched_to_bit(m: &Match) -> u8 {
 pub(crate) fn matched_to_char(m: &Match) -> char {
     match m {
         Match::StartObject => 'o',
+        Match::EndObject => 'O',
         Match::StartArray => 'a',
+        Match::EndArray => 'A',
         Match::ObjectKey(_) => 'k',
         Match::Float(_) => 'f',
         Match::Integer(_) => 'i',

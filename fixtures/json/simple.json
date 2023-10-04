@@ -1,7 +1,7 @@
 {
   "a": "This is a string value",
   "b": 234234.43,
-  "c": [1, 2, 3, 4, 5, 6]
+  "c": [1, 2, 3, 4, 5, 6],
   "d" : null,
   "e" : true,
   "f" : false,

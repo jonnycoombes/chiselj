@@ -2,10 +2,18 @@
 
 All the most recent changes are summarised and grouped below:
 
-## [unreleased]
+## [0.1.4] - 2023-10-05
 
 ### Features
 
+- Added start and end coordinates to pointers output
+- Upgrade chisel-json to 0.1.22
+
+## [0.1.3] - 2023-05-12
+
+### Features
+
+- Bumped version number
 - Upgraded `chisel-json` to version 0.1.22
 - Added start and end coordinates to pointer output
 - Started adding sane documentation around available commands

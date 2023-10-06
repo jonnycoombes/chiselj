@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use crate::render::options::RenderOptions;
-use crate::state::AppChangeState;
+use crate::state::AppState;
 use clap::Parser;
 use cli::{AppArguments, AppCommand};
 use commands::{Command, CommandContext};
@@ -17,7 +17,7 @@ mod threads;
 /// Create a new [CommandContext] and execute the specified [Command] instance
 fn execute_command(cmd: &mut impl Command) -> i32 {
     let render_options = RenderOptions::default();
-    let mut state = AppChangeState::new(render_options);
+    let mut state = AppState::new(render_options);
     let mut context = CommandContext::new(state.get_render_pipeline());
     match cmd.execute(&mut context) {
         Ok(_) => {

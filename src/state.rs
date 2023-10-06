@@ -7,15 +7,15 @@ use std::sync::mpsc::Sender;
 
 /// Struct representing the global application state
 #[derive(Debug)]
-pub struct AppChangeState {
+pub struct AppState {
     /// Worker threads
     threads: AppThreads,
 }
 
-impl AppChangeState {
+impl AppState {
     /// Create a new instance of the global application state
     pub fn new(render_options: RenderOptions) -> Self {
-        AppChangeState {
+        AppState {
             threads: AppThreads {
                 renderer: new_renderer(render_options),
             },

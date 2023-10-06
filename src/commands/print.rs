@@ -20,7 +20,7 @@ pub struct PrintCommand {
 
     /// Indent space count
     ///
-    /// Object keys and array values are idented by this amount plus the parent identation amount
+    /// Object keys and array values are idented by this amount plus the parent indentation amount
     #[arg(short, long, value_name = "n", default_value = "2")]
     pub indent: u16,
 

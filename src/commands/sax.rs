@@ -1,6 +1,6 @@
 //! All utility and useful functions relating to SAX-based parsing should go in here
 
-use chisel_json::events::Match;
+use chisel_json::parsers::sax_events::Match;
 use clap::ValueEnum;
 
 // set of bits for building a filter
@@ -28,21 +28,21 @@ const ALL: u8 = 0b1111_1111;
 /// specific pointer point to?
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum PointerType {
-    /// object elements
+    /// object elements (o)
     Objects,
-    /// array elements
+    /// array elements (a)
     Arrays,
-    /// object member key elements
+    /// object member key elements (k)
     Keys,
-    /// string value elements
+    /// string value elements (s)
     Strings,
-    /// float value elements
+    /// float value elements (f)
     Floats,
-    /// integer value elements
+    /// integer value elements (i)
     Integers,
-    /// boolean value elements
+    /// boolean value elements (b)
     Booleans,
-    /// null value elements
+    /// null value elements (n)
     Nulls,
 }
 

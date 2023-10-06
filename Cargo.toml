@@ -1,6 +1,6 @@
 [package]
 name = "chiselj"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 authors = ["Jonny Coombes <jcoombes@jcs-software.co.uk>"]
 rust-version = "1.56"
@@ -11,8 +11,8 @@ categories = ["text-processing", "command-line-interface", "command-line-utiliti
 repository = "https://github.com/jonnycoombes/chiselj"
 
 [dependencies]
-clap = {version = "4.1.6", features = ["derive", "cargo"]}
-chisel-json = {version = "1.0.2" }
+clap = {version = "4.4.6", features = ["derive", "cargo"]}
+chisel-json = {version = "1.0.4" }
 crossterm = {version = "0.27.0" }
 atty = {version = "0.2.14"}
 

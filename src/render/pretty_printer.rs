@@ -2,7 +2,7 @@
 use crate::cl_immediate;
 use crate::errors::{ChiselError, ChiselResult};
 use crate::render::display_lists::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
-use chisel_json::JsonValue;
+use chisel_json::{JsonKeyValue, JsonValue};
 use std::sync::mpsc::Sender;
 
 /// Options that control the output from a given printer instance
@@ -140,7 +140,7 @@ impl PrettyPrinter {
 
     /// Surround an object with braces at the correct indent level, and recursively render
     /// children at the next indent level
-    fn render_json_object(&self, level: u16, kids: Vec<(String, JsonValue)>) -> ChiselResult<()> {
+    fn render_json_object(&self, level: u16, kids: Vec<JsonKeyValue>) -> ChiselResult<()> {
         let kidcount = kids.len();
         let empty = kids.is_empty();
 
@@ -152,11 +152,11 @@ impl PrettyPrinter {
         }
 
         // render the kids
-        for (i, (key, value)) in kids.into_iter().enumerate() {
+        for (i, kv) in kids.into_iter().enumerate() {
             if i == kidcount - 1 {
-                self.render_json_pair(level + 1, false, key, value)?;
+                self.render_json_pair(level + 1, false, kv.key, kv.value)?;
             } else {
-                self.render_json_pair(level + 1, true, key, value)?;
+                self.render_json_pair(level + 1, true, kv.key, kv.value)?;
             }
         }
 

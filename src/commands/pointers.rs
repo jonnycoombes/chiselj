@@ -4,9 +4,9 @@ use crate::cl_immediate;
 use crate::errors::ChiselResult;
 use crate::render::display_lists::{DisplayList, DisplayListCommand, DisplayListMode, Draw};
 use crate::sources::{source_from_file, source_from_stdin};
-use chisel_json::errors::ParserResult;
-use chisel_json::events::Event;
-use chisel_json::sax::Parser as SaxParser;
+use chisel_json::parsers::sax::Parser;
+use chisel_json::parsers::sax_events::Event;
+use chisel_json::results::ParserResult;
 use clap::Args;
 use std::path::PathBuf;
 
@@ -32,6 +32,18 @@ pub struct PointersCommand {
     #[arg(short, long, default_value = ":")]
     pub delimiter: char,
 
+    /// Show locations
+    ///
+    /// Show location information relating to each discovered pointer.  
+    #[arg(long="show-locations", action=clap::ArgAction::SetTrue)]
+    pub show_locations: bool,
+
+    /// Show types
+    ///
+    /// Show type information relating to each discovered pointer.  
+    #[arg(long="show-types", action=clap::ArgAction::SetTrue)]
+    pub show_types: bool,
+
     /// The currently operating filter, will default to [ALL]
     #[clap(skip)]
     pub filter: u8,
@@ -43,20 +55,32 @@ impl PointersCommand {
         if (matched_to_bit(&evt.matched) & self.filter) > 0 {
             match evt.pointer {
                 Some(p) => {
-                    let _ = context.render_pipeline.send(cl_immediate!(
-                        Draw::Text(format!("{}", evt.span.start.line)),
-                        Draw::Char(self.delimiter),
-                        Draw::Text(format!("{}", evt.span.start.column)),
-                        Draw::Char(self.delimiter),
-                        Draw::Text(format!("{}", evt.span.end.line)),
-                        Draw::Char(self.delimiter),
-                        Draw::Text(format!("{}", evt.span.end.column)),
-                        Draw::Char(self.delimiter),
-                        Draw::Char(matched_to_char(&evt.matched)),
-                        Draw::Char(self.delimiter),
-                        Draw::Text(p.to_string()),
-                        Draw::NewLine
-                    ));
+                    // display location information
+                    if self.show_locations {
+                        let _ = context.render_pipeline.send(cl_immediate!(
+                            Draw::Text(format!("{}", evt.span.start.line)),
+                            Draw::Char(self.delimiter),
+                            Draw::Text(format!("{}", evt.span.start.column)),
+                            Draw::Char(self.delimiter),
+                            Draw::Text(format!("{}", evt.span.end.line)),
+                            Draw::Char(self.delimiter),
+                            Draw::Text(format!("{}", evt.span.end.column)),
+                            Draw::Char(self.delimiter)
+                        ));
+                    }
+
+                    // output type information
+                    if self.show_types {
+                        let _ = context.render_pipeline.send(cl_immediate!(
+                            Draw::Char(matched_to_char(&evt.matched)),
+                            Draw::Char(self.delimiter),
+                        ));
+                    }
+
+                    // output the pointer
+                    let _ = context
+                        .render_pipeline
+                        .send(cl_immediate!(Draw::Text(p.to_string()), Draw::NewLine));
                 }
                 None => (),
             }
@@ -80,7 +104,7 @@ impl Command for PointersCommand {
 
         // instantiate a SAX parser instance and process the input, by delegating
         // to the `handle_sax_event` associated function
-        let parser = SaxParser::default();
+        let parser = Parser::default();
         let _result = parser.parse_bytes(&buffer, &mut |evt| self.handle_sax_event(context, evt));
 
         Ok(())

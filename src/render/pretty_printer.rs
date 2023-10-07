@@ -26,7 +26,7 @@ impl Default for FormatOptions {
 
 /// Pretty printer for [JsonValue]s
 pub struct PrettyPrinter {
-    /// The [ActionContext] associated with the printer
+    /// The pipeline channel to send display lists to
     pub pipeline: Sender<DisplayList>,
 
     /// The formatting options

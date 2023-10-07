@@ -55,25 +55,24 @@ impl PointersCommand {
         if (matched_to_bit(&evt.matched) & self.filter) > 0 {
             match evt.pointer {
                 Some(p) => {
-                    // display location information
-                    if self.show_locations {
-                        let _ = context.render_pipeline.send(cl_immediate!(
-                            Draw::Text(format!("{}", evt.span.start.line)),
-                            Draw::Char(self.delimiter),
-                            Draw::Text(format!("{}", evt.span.start.column)),
-                            Draw::Char(self.delimiter),
-                            Draw::Text(format!("{}", evt.span.end.line)),
-                            Draw::Char(self.delimiter),
-                            Draw::Text(format!("{}", evt.span.end.column)),
-                            Draw::Char(self.delimiter)
-                        ));
-                    }
-
                     // output type information
                     if self.show_types {
                         let _ = context.render_pipeline.send(cl_immediate!(
-                            Draw::Char(matched_to_char(&evt.matched)),
+                            Draw::Slice(matched_to_char(&evt.matched)),
                             Draw::Char(self.delimiter),
+                        ));
+                    }
+
+                    // display location information
+                    if self.show_locations {
+                        let _ = context.render_pipeline.send(cl_immediate!(
+                            Draw::Text(format!(
+                                "({},{})",
+                                evt.span.start.line, evt.span.start.column
+                            )),
+                            Draw::Char(self.delimiter),
+                            Draw::Text(format!("({},{})", evt.span.end.line, evt.span.end.column)),
+                            Draw::Char(self.delimiter)
                         ));
                     }
 

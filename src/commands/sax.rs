@@ -51,7 +51,9 @@ pub enum PointerType {
 pub(crate) fn matched_to_bit(m: &Match) -> u8 {
     match m {
         Match::StartObject => OBJECT,
+        Match::EndObject => OBJECT,
         Match::StartArray => ARRAY,
+        Match::EndArray => ARRAY,
         Match::ObjectKey(_) => KEY,
         Match::Float(_) => FLOAT,
         Match::Integer(_) => INTEGER,
@@ -65,19 +67,19 @@ pub(crate) fn matched_to_bit(m: &Match) -> u8 {
 /// Converts a specific [Match] emitted by the SAX parser into a single `char` that can be output as part of a
 /// specific command execution
 #[inline]
-pub(crate) fn matched_to_char(m: &Match) -> char {
+pub(crate) fn matched_to_char(m: &Match) -> &'static str {
     match m {
-        Match::StartObject => 'o',
-        Match::EndObject => 'O',
-        Match::StartArray => 'a',
-        Match::EndArray => 'A',
-        Match::ObjectKey(_) => 'k',
-        Match::Float(_) => 'f',
-        Match::Integer(_) => 'i',
-        Match::Null => 'n',
-        Match::Boolean(_) => 'b',
-        Match::String(_) => 's',
-        _ => '?',
+        Match::StartObject => "start_obj",
+        Match::EndObject => "end_obj",
+        Match::StartArray => "start_arr",
+        Match::EndArray => "end_arr",
+        Match::ObjectKey(_) => "key",
+        Match::Float(_) => "float",
+        Match::Integer(_) => "int",
+        Match::Null => "null",
+        Match::Boolean(_) => "bool",
+        Match::String(_) => "str",
+        _ => "?",
     }
 }
 

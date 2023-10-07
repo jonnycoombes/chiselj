@@ -1,11 +1,11 @@
+use chisel_json::coords::Coords;
+use chisel_json::parsers::dom::Parser;
 use std::path::PathBuf;
 
 use super::{Command, CommandContext};
 use crate::errors::ChiselResult;
 use crate::render::pretty_printer::{FormatOptions, PrettyPrinter};
 use crate::sources::{source_from_file, source_from_stdin};
-use chisel_json::coords::Coords;
-use chisel_json::dom::Parser as DomParser;
 use clap::Args;
 
 /// An [Action] responsible for just printing (pretty or otherwise) the input
@@ -20,7 +20,7 @@ pub struct PrintCommand {
 
     /// Indent space count
     ///
-    /// Object keys and array values are idented by this amount plus the parent identation amount
+    /// Object keys and array values are idented by this amount plus the parent indentation amount
     #[arg(short, long, value_name = "n", default_value = "2")]
     pub indent: u16,
 
@@ -43,7 +43,7 @@ impl Command for PrintCommand {
         }
 
         // grab a DOM parser and build ourselves some JSON
-        let parser = DomParser::default();
+        let parser = Parser::default();
         let parse_result = parser.parse_bytes(&buffer);
 
         match parse_result {
